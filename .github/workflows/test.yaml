@@ -1,0 +1,37 @@
+name: Go Test Workflow
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+
+    - name: Download dependencies
+      run: go mod download
+
+    - name: Run tests 
+      run: go test -v ./... -tags=test -coverpkg=./pkg/...,./internal/... -coverprofile=coverage.txt
+    
+    - name: Go Vet
+      run: go vet ./...
+    
+    - name: Install Golint
+      run: go install golang.org/x/lint/golint@latest
+      
+    - name: Run Golint
+      run: golint -set_exit_status ./...
+    
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: coverage.txt

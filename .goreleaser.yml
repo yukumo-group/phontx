@@ -1,0 +1,9 @@
+version: 2
+
+gomod:
+  proxy: true
+
+release:
+  github:
+    owner: yukumo-group
+    name: phontx
