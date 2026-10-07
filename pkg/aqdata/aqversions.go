@@ -41,3 +41,17 @@ func (version AquesVersion) ToString() string {
 		return "Not Defined"
 	}
 }
+
+// ToInt converts the version to int
+func (version AquesVersion) ToInt() int {
+	switch version {
+	case AqVer1:
+		return 1
+	case AqVer2:
+		return 2
+	case AqVer10:
+		return 10
+	default:
+		return 2
+	}
+}
