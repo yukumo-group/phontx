@@ -24,6 +24,18 @@ func TestAq1Presets(t *testing.T) {
 			"expected to throw an error here!",
 		)
 	}
+	result, err = ToAq1Preset(-114514)
+	if err == nil {
+		t.Error(
+			"expected to throw an error here!",
+		)
+	}
+	result, err = ToAq1Preset(9)
+	if err == nil {
+		t.Error(
+			"expected to throw an error here!",
+		)
+	}
 	allAqs, err := GetAq1Presets(
 		-1,
 	)

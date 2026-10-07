@@ -106,7 +106,7 @@ const (
 	// Aq2AqRb3 -> aq_rb3
 	Aq2AqRb3
 	// Aq2AqRm -> aq_rm
-	Aq2AqRM
+	Aq2AqRm
 	// Aq2AqRobo -> aq_robo
 	Aq2AqRobo
 	// Aq2AqTeto1 -> aq_teto1
