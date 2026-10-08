@@ -192,7 +192,7 @@ func GetAq2Presets(
 	return result, nil
 }
 
-// Aq10Presets defines presets for aquestalk10
+// Aq10Preset defines presets for aquestalk10
 type Aq10Preset int
 
 const (
@@ -225,4 +225,22 @@ func ToAq10Preset(
 		)
 	}
 	return Aq10Preset(data), nil
+}
+
+// GetAq10Presets gets presets for aquestalk2.
+// numPresetsFetched is the total number of presets fetched
+// its range is from 0 to 9
+func GetAq10Presets(
+	numPresetsFetched int,
+) ([]Aq10Preset, error) {
+	realNum := min(max(numPresetsFetched, 0), 8)
+	result := []Aq10Preset{}
+	for i := range realNum {
+		data, err := ToAq10Preset(i)
+		if err != nil {
+			return result, err
+		}
+		result = append(result, data)
+	}
+	return result, nil
 }
