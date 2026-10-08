@@ -37,4 +37,28 @@ func TestConvertIntToAqVersion(t *testing.T) {
 			result10.ToString(),
 		)
 	}
+	resultInt1 := AqVer1.ToInt()
+	if resultInt1 != 1 {
+		t.Errorf(
+			"expected %d, got %d",
+			1,
+			resultInt1,
+		)
+	}
+	resultInt2 := AqVer2.ToInt()
+	if resultInt2 != 2 {
+		t.Errorf(
+			"expected %d, got %d",
+			2,
+			resultInt2,
+		)
+	}
+	resultInt10 := AqVer10.ToInt()
+	if resultInt10 != 10 {
+		t.Errorf(
+			"expected %d, got %d",
+			10,
+			resultInt10,
+		)
+	}
 }

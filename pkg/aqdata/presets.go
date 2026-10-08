@@ -61,7 +61,7 @@ func (preset Aq1Preset) ToString() string {
 	case JGRaq1:
 		return "jgr"
 	default:
-		return "Not Supported"
+		return "not_supported"
 	}
 }
 
@@ -125,5 +125,104 @@ const (
 func ToAq2Preset(
 	data int,
 ) (Aq2Preset, error) {
+	if data > 15 || data < 0 {
+		return Aq2AqYukkuri, fmt.Errorf(
+			"%d is not in range of 0-15",
+			data,
+		)
+	}
 	return Aq2Preset(data), nil
+}
+
+// ToString converts presets to string
+func (preset Aq2Preset) ToString() string {
+	switch preset {
+	case Aq2AqYukkuri:
+		return "aq_yukkuri"
+	case Aq2AqDefo1:
+		return "aq_defo1"
+	case Aq2AqF1c:
+		return "aq_f1c"
+	case Aq2AqF3a:
+		return "aq_f3a"
+	case Aq2AqHuskey:
+		return "aq_huskey"
+	case Aq2AqM4b:
+		return "aq_m4b"
+	case Aq2AqMf1:
+		return "aq_mf1"
+	case Aq2AqRb2:
+		return "aq_rb2"
+	case Aq2AqRb3:
+		return "aq_rb3"
+	case Aq2AqRm:
+		return "aq_rm"
+	case Aq2AqRobo:
+		return "aq_robo"
+	case Aq2AqTeto1:
+		return "aq_teto1"
+	case Aq2ArF4:
+		return "ar_f4"
+	case Aq2ArM5:
+		return "ar_m5"
+	case Aq2ArMF2:
+		return "ar_mf2"
+	case Aq2ArRM3:
+		return "ar_rm3"
+	default:
+		return "not_supported"
+	}
+}
+
+// GetAq2Presets gets presets for aquestalk2.
+// numPresetsFetched is the total number of presets fetched
+// its range is from 0 to 9
+func GetAq2Presets(
+	numPresetsFetched int,
+) ([]Aq2Preset, error) {
+	realNum := min(max(numPresetsFetched, 0), 16)
+	result := []Aq2Preset{}
+	for i := range realNum {
+		data, err := ToAq2Preset(i)
+		if err != nil {
+			return result, err
+		}
+		result = append(result, data)
+	}
+	return result, nil
+}
+
+// Aq10Presets defines presets for aquestalk10
+type Aq10Preset int
+
+const (
+	// Aq10Custom uses custom data
+	Aq10Custom Aq10Preset = iota
+	// Aq10F1 -> f1
+	Aq10F1
+	// Aq10F2 -> f2
+	Aq10F2
+	// Aq10F3 -> f3
+	Aq10F3
+	// Aq10M1 -> m1
+	Aq10M1
+	// Aq10M2 -> m2
+	Aq10M2
+	// Aq10R1 -> r1
+	Aq10R1
+	// Aq10R2 -> r2
+	Aq10R2
+)
+
+// ToAq10Preset converts int to preset of aq10
+func ToAq10Preset(
+	data int,
+) (Aq10Preset, error) {
+	if data < 0 || data > 7 {
+		return Aq10Custom, fmt.Errorf(
+			"%d is out of range 0-7",
+			data,
+		)
+	}
+	return Aq10Preset(data), nil
 }
