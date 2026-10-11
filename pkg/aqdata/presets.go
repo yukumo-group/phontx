@@ -29,6 +29,7 @@ const (
 )
 
 // ToAq1Preset converts int to preset of aquestalk1
+// It ranges from 0 to 8
 func ToAq1Preset(data int) (Aq1Preset, error) {
 	if data < 0 || data > 8 {
 		return F1aq1, fmt.Errorf(
@@ -121,7 +122,8 @@ const (
 	Aq2ArRM3
 )
 
-// ToAq2Preset converts in to preset of aquestalk2
+// ToAq2Preset converts in to preset of aquestalk2.
+// It ranges from 0 to 15.
 func ToAq2Preset(
 	data int,
 ) (Aq2Preset, error) {
@@ -176,7 +178,7 @@ func (preset Aq2Preset) ToString() string {
 
 // GetAq2Presets gets presets for aquestalk2.
 // numPresetsFetched is the total number of presets fetched
-// its range is from 0 to 9
+// its range is from 0 to 16
 func GetAq2Presets(
 	numPresetsFetched int,
 ) ([]Aq2Preset, error) {
@@ -215,6 +217,7 @@ const (
 )
 
 // ToAq10Preset converts int to preset of aq10
+// Ranges from 0-7
 func ToAq10Preset(
 	data int,
 ) (Aq10Preset, error) {
@@ -227,9 +230,33 @@ func ToAq10Preset(
 	return Aq10Preset(data), nil
 }
 
+// ToString converts Aq10Preset to string
+func (preset Aq10Preset) ToString() string {
+	switch preset {
+	case Aq10Custom:
+		return "custom"
+	case Aq10F1:
+		return "f1"
+	case Aq10F2:
+		return "f2"
+	case Aq10F3:
+		return "f3"
+	case Aq10M1:
+		return "m1"
+	case Aq10M2:
+		return "m2"
+	case Aq10R1:
+		return "r1"
+	case Aq10R2:
+		return "r2"
+	default:
+		return "not_supported"
+	}
+}
+
 // GetAq10Presets gets presets for aquestalk2.
 // numPresetsFetched is the total number of presets fetched
-// its range is from 0 to 9
+// its range is from 0 to 8
 func GetAq10Presets(
 	numPresetsFetched int,
 ) ([]Aq10Preset, error) {
