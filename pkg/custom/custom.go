@@ -1,7 +1,7 @@
 package custom
 
-// CustomAq10Config defines the aq10 config by custom
-type CustomAq10Config struct {
+// Aq10Config defines the aq10 config by custom
+type Aq10Config struct {
 	Base   int
 	Volume int
 	Pitch  int
@@ -10,9 +10,9 @@ type CustomAq10Config struct {
 	Fsc    int
 }
 
-// NewCustomAq10Config creates new aquestalk10 config
-func NewCustomAq10Config() *CustomAq10Config {
-	return &CustomAq10Config{
+// NewAq10Config creates new aquestalk10 config
+func NewAq10Config() *Aq10Config {
+	return &Aq10Config{
 		Volume: 100,
 		Lmd:    100,
 		Fsc:    100,
