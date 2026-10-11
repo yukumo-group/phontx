@@ -46,4 +46,43 @@ func TestBases(t *testing.T) {
 			testData3.ToString(),
 		)
 	}
+	allBases, err := GetAllAq10Bases(
+		-1,
+	)
+	if err != nil {
+		t.Error(err)
+	}
+	if len(allBases) != 0 {
+		t.Errorf(
+			"expected the length of all bases fetched here to be %d, got %d",
+			0,
+			len(allBases),
+		)
+	}
+	allBases, err = GetAllAq10Bases(
+		114514,
+	)
+	if err != nil {
+		t.Error(err)
+	}
+	if len(allBases) != 3 {
+		t.Errorf(
+			"expected the length of all bases fetched here to be %d, got %d",
+			3,
+			len(allBases),
+		)
+	}
+	allBases, err = GetAllAq10Bases(
+		2,
+	)
+	if err != nil {
+		t.Error(err)
+	}
+	if len(allBases) != 2 {
+		t.Errorf(
+			"expected the length of all bases fetched here to be %d, got %d",
+			2,
+			len(allBases),
+		)
+	}
 }

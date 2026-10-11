@@ -14,12 +14,19 @@ const (
 	M1E
 )
 
+// VerifyBase verifies whether this data is a valid base
+func VerifyBase(
+	data int,
+) bool {
+	return data >= 0 && data <= 2
+}
+
 // ToAq10Base converts int to Aq10Bases.
 // Range: 0-2.
 func ToAq10Base(
 	data int,
 ) (Aq10Base, error) {
-	if data > 2 || data < 0 {
+	if !VerifyBase(data) {
 		return F1E, fmt.Errorf(
 			"%d is not in the range of 0-2",
 			data,
