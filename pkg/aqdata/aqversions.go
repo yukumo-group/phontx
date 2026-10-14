@@ -32,11 +32,11 @@ func ToAquesVersion(
 func (version AquesVersion) ToString() string {
 	switch version {
 	case AqVer1:
-		return "AquesTalkV1"
+		return "AquesTalk1"
 	case AqVer2:
-		return "AquesTalkV2"
+		return "AquesTalk2"
 	case AqVer10:
-		return "AquesTalkV10"
+		return "AquesTalk10"
 	default:
 		return "Not Defined"
 	}
