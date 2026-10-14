@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// DisplayWelcome displays the welcome text
 func DisplayWelcome() {
 	fmt.Println("    ____  __                __ _  __")
 	fmt.Println("   / __ \\/ /_  ____  ____  / /| |/ /")
