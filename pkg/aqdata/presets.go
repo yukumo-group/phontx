@@ -8,31 +8,31 @@ import (
 type Aq1Preset int
 
 const (
-	// F1aq1 -> f1 of aquestalk 1 library
-	F1aq1 Aq1Preset = iota
-	// F2aq1 -> f2 of aquestalk 1 library
-	F2aq1
-	// F3aq1 -> f3 of aquestalk 1 library
-	F3aq1
-	// M1aq1 -> m1 of aquestalk 1 library
-	M1aq1
-	// M2aq1 -> m2 of aquestalk 1 library
-	M2aq1
-	// R1aq1 -> r1 of aquestalk 1 library
-	R1aq1
-	// DVDaq1 -> dvd of aquestalk 1 library
-	DVDaq1
-	// IMD1aq1 -> imd1 of aquestalk 1 library
-	IMD1aq1
-	// JGRaq1 -> jgr of aquestalk 1 library
-	JGRaq1
+	// Aq1F1 -> f1 of aquestalk 1 library
+	Aq1F1 Aq1Preset = iota
+	// Aq1F2 -> f2 of aquestalk 1 library
+	Aq1F2
+	// Aq1F3 -> f3 of aquestalk 1 library
+	Aq1F3
+	// Aq1M1 -> m1 of aquestalk 1 library
+	Aq1M1
+	// Aq1M2 -> m2 of aquestalk 1 library
+	Aq1M2
+	// Aq1R1 -> r1 of aquestalk 1 library
+	Aq1R1
+	// Aq1DVD -> dvd of aquestalk 1 library
+	Aq1DVD
+	// Aq1IMD1 -> imd1 of aquestalk 1 library
+	Aq1IMD1
+	// Aq1JGR -> jgr of aquestalk 1 library
+	Aq1JGR
 )
 
 // ToAq1Preset converts int to preset of aquestalk1
 // It ranges from 0 to 8
 func ToAq1Preset(data int) (Aq1Preset, error) {
 	if data < 0 || data > 8 {
-		return F1aq1, fmt.Errorf(
+		return Aq1F1, fmt.Errorf(
 			"%d is not in range of 0-8",
 			data,
 		)
@@ -43,23 +43,23 @@ func ToAq1Preset(data int) (Aq1Preset, error) {
 // ToString converts Aq1Preset to string
 func (preset Aq1Preset) ToString() string {
 	switch preset {
-	case F1aq1:
+	case Aq1F1:
 		return "f1"
-	case F2aq1:
+	case Aq1F2:
 		return "f2"
-	case F3aq1:
+	case Aq1F3:
 		return "f3"
-	case M1aq1:
+	case Aq1M1:
 		return "m1"
-	case M2aq1:
+	case Aq1M2:
 		return "m2"
-	case R1aq1:
+	case Aq1R1:
 		return "r1"
-	case DVDaq1:
+	case Aq1DVD:
 		return "dvd"
-	case IMD1aq1:
+	case Aq1IMD1:
 		return "imd1"
-	case JGRaq1:
+	case Aq1JGR:
 		return "jgr"
 	default:
 		return "not_supported"

@@ -11,11 +11,11 @@ func TestAq1Presets(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if result != F1aq1 {
+	if result != Aq1F1 {
 		t.Errorf(
 			"expected %s, got %s",
 			result.ToString(),
-			F1aq1.ToString(),
+			Aq1F1.ToString(),
 		)
 	}
 	result, err = ToAq1Preset(114514)

@@ -4,20 +4,20 @@ import (
 	"testing"
 )
 
-// TestAq10ConfigSetting tests the setting for aq10config
-func TestAq10ConfigSetting(t *testing.T) {
+// TestAq10CustomToneSetting tests the setting for Aq10CustomTone
+func TestAq10CustomToneSetting(t *testing.T) {
 	t.Parallel()
-	expectedCfg1 := &Aq10Config{
+	expectedCfg1 := &Aq10CustomTone{
 		Base: 0,
 		FSC:  150,
 		LMD:  150,
 	}
-	expectedCfg2 := &Aq10Config{
+	expectedCfg2 := &Aq10CustomTone{
 		Base: 0,
 		FSC:  50,
 		LMD:  200,
 	}
-	cfg1 := NewAq10Config().WithBase(
+	cfg1 := NewAq10CustomTone().WithBase(
 		F1E,
 	).WithFSC(
 		150,
@@ -29,7 +29,7 @@ func TestAq10ConfigSetting(t *testing.T) {
 			"there is a problem in setting config",
 		)
 	}
-	cfg2 := NewAq10Config().WithBase(
+	cfg2 := NewAq10CustomTone().WithBase(
 		F1E,
 	).WithFSC(
 		-1,
