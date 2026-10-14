@@ -1,4 +1,4 @@
-﻿package aqdata
+package aqdata
 
 import "fmt"
 
