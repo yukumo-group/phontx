@@ -72,6 +72,10 @@ func (tone *Data) SetAq10CustomTone(
 func (tone *Data) SetPhontDataFromFile(
 	phontFilePath string,
 ) error {
+	_, err := os.Stat(phontFilePath)
+	if err != nil {
+		return err
+	}
 	fileName := filepath.Base(
 		phontFilePath,
 	)
