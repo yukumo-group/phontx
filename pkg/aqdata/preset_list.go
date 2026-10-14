@@ -19,6 +19,8 @@ func (p preset) Index() (int, bool) {
 // type constraint for preset
 type presetLike interface {
 	~struct{ preset }
+	ToString() string
+	Index() (int, bool)
 }
 
 // list of presets accepting generic preset type
