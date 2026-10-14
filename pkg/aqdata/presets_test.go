@@ -4,29 +4,33 @@ import (
 	"testing"
 )
 
-func checkPresets[T comparable](t *testing.T, list *presetList[T], first T) {
+// checks the preset list methods
+func checkPresets[T presetLike](t *testing.T, list *presetList[T], first T) {
 	t.Helper()
-	got, err := list.fromIndex(0)
+	// check the FromIndex method
+	got, err := list.FromIndex(0)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if got != first {
-		t.Errorf("fromIndex(0) = %v, expected %v", got, first)
+		t.Errorf("FromIndex(0) = %v, expected %v", got, first)
 	}
-	for _, i := range []int{-1, list.length(), 114514} {
-		if _, err := list.fromIndex(i); err == nil {
-			t.Errorf("fromIndex(%d) succeeded, expected error", i)
+	// check the FromIndex method with out of range index
+	for _, i := range []int{-1, list.Length(), 114514} {
+		if _, err := list.FromIndex(i); err == nil {
+			t.Errorf("FromIndex(%d) succeeded, expected error", i)
 		}
 	}
-	n := list.length()
+	// check the GetPresets method
+	n := list.Length()
 	for _, tc := range []struct{ limit, expected int }{
 		{-1, 0},
 		{5, min(5, n)},
 		{n, n},
 		{114514, n},
 	} {
-		if got := len(list.getPresets(tc.limit)); got != tc.expected {
-			t.Errorf("getPresets(%d) len = %d, expected %d", tc.limit, got, tc.expected)
+		if got := len(list.GetPresets(tc.limit)); got != tc.expected {
+			t.Errorf("GetPresets(%d) len = %d, expected %d", tc.limit, got, tc.expected)
 		}
 	}
 }

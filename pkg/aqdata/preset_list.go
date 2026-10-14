@@ -16,36 +16,50 @@ func (p preset) Index() (int, bool) {
 	return p.index, true
 }
 
-type presetList[T any] struct {
-	presets []T
-	byName  map[string]T
-	build   func(index int, name string) T
+// type constraint for preset
+type presetLike interface {
+	~struct{ preset }
 }
 
+// list of presets accepting generic preset type
+type presetList[T presetLike] struct {
+	presets []T
+	byName  map[string]T
+}
+
+// define a new preset
 func (l *presetList[T]) define(name string) T {
 	if l.byName == nil {
+		// init byName map if it is nil
 		l.byName = make(map[string]T)
 	}
 	if _, ok := l.byName[name]; ok {
+		// enough to panic
 		panic("duplicate preset " + name)
 	}
-	p := l.build(len(l.presets), name)
+	// create a new preset based on the preset type
+	p := T{preset{len(l.presets), name}}
 	l.presets = append(l.presets, p)
 	l.byName[name] = p
 	return p
 }
 
-func (l *presetList[T]) length() int { return len(l.presets) }
+// get the length of the preset list
+func (l *presetList[T]) Length() int { return len(l.presets) }
 
-func (l *presetList[T]) fromIndex(i int) (T, error) {
-	if i < 0 || i >= l.length() {
+// get the preset by index
+func (l *presetList[T]) FromIndex(i int) (T, error) {
+	// range check
+	if i < 0 || i >= l.Length() {
 		var zero T
-		return zero, fmt.Errorf("%d is out of range 0-%d", i, l.length()-1)
+		return zero, fmt.Errorf("%d is out of range 0-%d", i, l.Length()-1)
 	}
 	return l.presets[i], nil
 }
 
-func (l *presetList[T]) fromName(name string) (T, error) {
+// get the preset by its name
+func (l *presetList[T]) FromName(name string) (T, error) {
+	// lookup the preset by name
 	p, ok := l.byName[name]
 	if !ok {
 		var zero T
@@ -54,7 +68,8 @@ func (l *presetList[T]) fromName(name string) (T, error) {
 	return p, nil
 }
 
-func (l *presetList[T]) getPresets(limit int) []T {
-	limit = min(max(limit, 0), l.length())
+// get the presets up to the limit
+func (l *presetList[T]) GetPresets(limit int) []T {
+	limit = min(max(limit, 0), l.Length())
 	return l.presets[:limit]
 }

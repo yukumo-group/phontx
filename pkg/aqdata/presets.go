@@ -2,11 +2,7 @@ package aqdata
 
 type Aq1Preset struct{ preset }
 
-var aq1Presets = presetList[Aq1Preset]{
-	build: func(index int, name string) Aq1Preset {
-		return Aq1Preset{preset{index, name}}
-	},
-}
+var aq1Presets presetList[Aq1Preset]
 
 var (
 	Aq1F1   = aq1Presets.define("f1")
@@ -22,11 +18,7 @@ var (
 
 type Aq2Preset struct{ preset }
 
-var aq2Presets = presetList[Aq2Preset]{
-	build: func(index int, name string) Aq2Preset {
-		return Aq2Preset{preset{index, name}}
-	},
-}
+var aq2Presets presetList[Aq2Preset]
 
 var (
 	Aq2AqYukkuri = aq2Presets.define("aq_yukkuri")
@@ -49,11 +41,7 @@ var (
 
 type Aq10Preset struct{ preset }
 
-var aq10Presets = presetList[Aq10Preset]{
-	build: func(index int, name string) Aq10Preset {
-		return Aq10Preset{preset{index, name}}
-	},
-}
+var aq10Presets presetList[Aq10Preset]
 
 var (
 	Aq10Custom = aq10Presets.define("custom")
