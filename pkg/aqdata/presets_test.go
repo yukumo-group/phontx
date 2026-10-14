@@ -31,12 +31,9 @@ func TestAq1Presets(t *testing.T) {
 			"expected to throw an error here!",
 		)
 	}
-	allAqs, err := GetAq1Presets(
+	allAqs := aq1Presets.getPresets(
 		-1,
 	)
-	if err != nil {
-		t.Error(err)
-	}
 	if len(allAqs) != 0 {
 		t.Errorf(
 			"expected the length of result to be %d, got %d",
@@ -44,12 +41,9 @@ func TestAq1Presets(t *testing.T) {
 			len(allAqs),
 		)
 	}
-	allAqs, err = GetAq1Presets(
+	allAqs = aq1Presets.getPresets(
 		114514,
 	)
-	if err != nil {
-		t.Error(err)
-	}
 	if len(allAqs) != 9 {
 		t.Errorf(
 			"expected the length of result to be %d, got %d",
@@ -57,7 +51,7 @@ func TestAq1Presets(t *testing.T) {
 			len(allAqs),
 		)
 	}
-	allAqs, err = GetAq1Presets(
+	allAqs = aq1Presets.getPresets(
 		5,
 	)
 	if len(allAqs) != 5 {
@@ -72,7 +66,7 @@ func TestAq1Presets(t *testing.T) {
 // TestAq2Presets tests functions related to presets of aquestalk2
 func TestAq2Presets(t *testing.T) {
 	t.Parallel()
-	result0, err := ToAq2Preset(0)
+	result0, err := aq2.fromIndex(0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -83,24 +77,21 @@ func TestAq2Presets(t *testing.T) {
 			Aq2AqYukkuri.ToString(),
 		)
 	}
-	_, err = ToAq2Preset(114514)
+	_, err = aq2.fromIndex(114514)
 	if err == nil {
 		t.Error(
 			"expected to throw an error here",
 		)
 	}
-	_, err = ToAq2Preset(-1)
+	_, err = aq2.fromIndex(-1)
 	if err == nil {
 		t.Error(
 			"expected to throw an error here",
 		)
 	}
-	allAqs, err := GetAq2Presets(
+	allAqs := aq2.getPresets(
 		-1,
 	)
-	if err != nil {
-		t.Error(err)
-	}
 	if len(allAqs) != 0 {
 		t.Errorf(
 			"expected the length of result to be %d, got %d",
@@ -108,12 +99,9 @@ func TestAq2Presets(t *testing.T) {
 			len(allAqs),
 		)
 	}
-	allAqs, err = GetAq2Presets(
+	allAqs = aq2.getPresets(
 		114514,
 	)
-	if err != nil {
-		t.Error(err)
-	}
 	if len(allAqs) != 16 {
 		t.Errorf(
 			"expected the length of result to be %d, got %d",
@@ -121,7 +109,7 @@ func TestAq2Presets(t *testing.T) {
 			len(allAqs),
 		)
 	}
-	allAqs, err = GetAq2Presets(
+	allAqs = aq2.getPresets(
 		16,
 	)
 	if len(allAqs) != 16 {
@@ -136,7 +124,7 @@ func TestAq2Presets(t *testing.T) {
 // TestAq10Presets tests presets of aquestalk10
 func TestAq10Presets(t *testing.T) {
 	t.Parallel()
-	result0, err := ToAq10Preset(0)
+	result0, err := aq10.fromIndex(0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -147,24 +135,21 @@ func TestAq10Presets(t *testing.T) {
 			Aq10Custom.ToString(),
 		)
 	}
-	_, err = ToAq10Preset(114514)
+	_, err = aq10.fromIndex(114514)
 	if err == nil {
 		t.Error(
 			"expected to throw an error here",
 		)
 	}
-	_, err = ToAq10Preset(-1)
+	_, err = aq10.fromIndex(-1)
 	if err == nil {
 		t.Error(
 			"expected to throw an error here",
 		)
 	}
-	allAqs, err := GetAq10Presets(
+	allAqs := aq10.getPresets(
 		-1,
 	)
-	if err != nil {
-		t.Error(err)
-	}
 	if len(allAqs) != 0 {
 		t.Errorf(
 			"expected the length of result to be %d, got %d",
@@ -172,12 +157,9 @@ func TestAq10Presets(t *testing.T) {
 			len(allAqs),
 		)
 	}
-	allAqs, err = GetAq10Presets(
+	allAqs = aq10.getPresets(
 		114514,
 	)
-	if err != nil {
-		t.Error(err)
-	}
 	if len(allAqs) != 8 {
 		t.Errorf(
 			"expected the length of result to be %d, got %d",
@@ -185,7 +167,7 @@ func TestAq10Presets(t *testing.T) {
 			len(allAqs),
 		)
 	}
-	allAqs, err = GetAq10Presets(
+	allAqs = aq10.getPresets(
 		8,
 	)
 	if len(allAqs) != 8 {

@@ -35,10 +35,12 @@ func (l *presetList[T]) define(name string) T {
 	return p
 }
 
+func (l *presetList[T]) length() int { return len(l.presets) }
+
 func (l *presetList[T]) fromIndex(i int) (T, error) {
-	if i < 0 || i >= len(l.presets) {
+	if i < 0 || i >= l.length() {
 		var zero T
-		return zero, fmt.Errorf("%d is out of range 0-%d", i, len(l.presets)-1)
+		return zero, fmt.Errorf("%d is out of range 0-%d", i, l.length()-1)
 	}
 	return l.presets[i], nil
 }
@@ -52,9 +54,7 @@ func (l *presetList[T]) fromName(name string) (T, error) {
 	return p, nil
 }
 
-func (l *presetList[T]) prefix(n int) []T {
-	n = min(max(n, 0), len(l.presets))
-	out := make([]T, n)
-	copy(out, l.presets[:n])
-	return out
+func (l *presetList[T]) getPresets(limit int) []T {
+	limit = min(max(limit, 0), l.length())
+	return l.presets[:limit]
 }

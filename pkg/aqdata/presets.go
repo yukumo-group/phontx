@@ -47,14 +47,6 @@ var (
 	Aq2ArRM3     = aq2.define("ar_rm3")
 )
 
-func ToAq2Preset(data int) (Aq2Preset, error) { return aq2.fromIndex(data) }
-
-func ParseAq2Preset(name string) (Aq2Preset, error) { return aq2.fromName(name) }
-
-func GetAq2Presets(numPresetsFetched int) ([]Aq2Preset, error) {
-	return aq2.prefix(numPresetsFetched), nil
-}
-
 type Aq10Preset struct{ preset }
 
 var aq10 = presetList[Aq10Preset]{
@@ -73,11 +65,3 @@ var (
 	Aq10R1     = aq10.define("r1")
 	Aq10R2     = aq10.define("r2")
 )
-
-func ToAq10Preset(data int) (Aq10Preset, error) { return aq10.fromIndex(data) }
-
-func ParseAq10Preset(name string) (Aq10Preset, error) { return aq10.fromName(name) }
-
-func GetAq10Presets(numPresetsFetched int) ([]Aq10Preset, error) {
-	return aq10.prefix(numPresetsFetched), nil
-}
