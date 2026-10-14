@@ -55,3 +55,12 @@ func (version AquesVersion) ToInt() int {
 		return 2
 	}
 }
+
+// GetAllVersions gets all the possible versions
+func GetAllVersions() []AquesVersion {
+	return []AquesVersion{
+		AqVer1,
+		AqVer2,
+		AqVer10,
+	}
+}

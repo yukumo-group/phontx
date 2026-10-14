@@ -1,6 +1,10 @@
 package tone
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/yukumo-group/phontx/pkg/aqdata"
 	"github.com/yukumo-group/phontx/pkg/custom"
 )
@@ -62,4 +66,31 @@ func (tone *Data) SetAq10CustomTone(
 ) *Data {
 	tone.Aq10CustomTone = customTone
 	return tone
+}
+
+// SetPhontDataFromFile reads phont data and sets the PhontsFileData
+func (tone *Data) SetPhontDataFromFile(
+	phontFilePath string,
+) error {
+	fileName := filepath.Base(
+		phontFilePath,
+	)
+	extension := filepath.Ext(
+		fileName,
+	)
+	if extension != ".phont" {
+		return fmt.Errorf(
+			"the file extension should be %s, got %s",
+			".phont",
+			extension,
+		)
+	}
+	data, err := os.ReadFile(phontFilePath)
+	if err != nil {
+		return err
+	}
+	tone = tone.SetPhontFileData(
+		data,
+	)
+	return nil
 }
