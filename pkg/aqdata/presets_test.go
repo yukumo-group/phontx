@@ -7,30 +7,25 @@ import (
 // TestAq1Presets tests presets for aquestalk 1
 func TestAq1Presets(t *testing.T) {
 	t.Parallel()
-	result, err := ToAq1Preset(0)
+	result, err := aq1Presets.fromIndex(0)
 	if err != nil {
 		t.Error(err)
+	} else if result != Aq1F1 {
+		t.Errorf("expected %s, got %s", Aq1F1.ToString(), result.ToString())
 	}
-	if result != Aq1F1 {
-		t.Errorf(
-			"expected %s, got %s",
-			result.ToString(),
-			Aq1F1.ToString(),
-		)
-	}
-	result, err = ToAq1Preset(114514)
+	result, err = aq1Presets.fromIndex(114514)
 	if err == nil {
 		t.Error(
 			"expected to throw an error here!",
 		)
 	}
-	result, err = ToAq1Preset(-114514)
+	result, err = aq1Presets.fromIndex(-114514)
 	if err == nil {
 		t.Error(
 			"expected to throw an error here!",
 		)
 	}
-	result, err = ToAq1Preset(9)
+	result, err = aq1Presets.fromIndex(9)
 	if err == nil {
 		t.Error(
 			"expected to throw an error here!",
