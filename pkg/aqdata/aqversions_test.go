@@ -1,64 +1,47 @@
 package aqdata
 
 import (
+	"slices"
 	"testing"
 )
 
-// TestConvertIntToAqVersion tests the converting from int to aquestalk version
-func TestConvertIntToAqVersion(t *testing.T) {
+// tests type conversions for AquesTalk versions
+func TestAquesVersion(t *testing.T) {
 	t.Parallel()
-	result1 := ToAquesVersion(
-		1,
-	)
-	if result1 != AqVer1 {
-		t.Errorf(
-			"expected %s, got %s",
-			AqVer1.ToString(),
-			result1.ToString(),
-		)
+	for _, tc := range []struct {
+		n    int
+		ver  AquesVersion
+		text string
+	}{
+		{1, AqVer1, "AquesTalk1"},
+		{2, AqVer2, "AquesTalk2"},
+		{10, AqVer10, "AquesTalk10"},
+	} {
+		if got := ToAquesVersion(tc.n); got != tc.ver {
+			t.Errorf("ToAquesVersion(%d) = %v, expected %v", tc.n, got, tc.ver)
+		}
+		if got := tc.ver.ToInt(); got != tc.n {
+			t.Errorf("ToInt(%v) = %d, expected %d", tc.ver, got, tc.n)
+		}
+		if got := tc.ver.ToString(); got != tc.text {
+			t.Errorf("ToString(%v) = %q, expected %q", tc.ver, got, tc.text)
+		}
 	}
-	result2 := ToAquesVersion(
-		2,
-	)
-	if result2 != AqVer2 {
-		t.Errorf(
-			"expected %s, got %s",
-			AqVer2.ToString(),
-			result2.ToString(),
-		)
+	for _, n := range []int{-1, 0, 3, 114514} {
+		if got := ToAquesVersion(n); got != AqVer2 {
+			t.Errorf("ToAquesVersion(%d) = %v, expected %v", n, got, AqVer2)
+		}
 	}
-	result10 := ToAquesVersion(
-		10,
-	)
-	if result10 != AqVer10 {
-		t.Errorf(
-			"expected %s, got %s",
-			AqVer10.ToString(),
-			result10.ToString(),
-		)
+	for _, v := range []AquesVersion{0, 3, 114514} {
+		if got := v.ToInt(); got != 2 {
+			t.Errorf("ToInt(%v) = %d, expected 2", v, got)
+		}
+		if got := v.ToString(); got != "Not Defined" {
+			t.Errorf("ToString(%v) = %q, expected %q", v, got, "Not Defined")
+		}
 	}
-	resultInt1 := AqVer1.ToInt()
-	if resultInt1 != 1 {
-		t.Errorf(
-			"expected %d, got %d",
-			1,
-			resultInt1,
-		)
-	}
-	resultInt2 := AqVer2.ToInt()
-	if resultInt2 != 2 {
-		t.Errorf(
-			"expected %d, got %d",
-			2,
-			resultInt2,
-		)
-	}
-	resultInt10 := AqVer10.ToInt()
-	if resultInt10 != 10 {
-		t.Errorf(
-			"expected %d, got %d",
-			10,
-			resultInt10,
-		)
+	got, expected := GetAllVersions(), []AquesVersion{AqVer1, AqVer2, AqVer10}
+	if !slices.Equal(got, expected) {
+		t.Errorf("GetAllVersions() = %v, expected %v", got, expected)
 	}
 }
