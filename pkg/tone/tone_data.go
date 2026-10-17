@@ -1,3 +1,4 @@
+//go:generate msgp
 package tone
 
 import (
@@ -21,6 +22,13 @@ type Data struct {
 	Aq10Preset *aqdata.Aq10Preset
 	// Defines the tone by custom for aquestalk10
 	Aq10CustomTone *custom.Aq10CustomTone
+}
+
+// NewDataFromFile reads new data from file
+func NewDataFromFile(
+	filePath string,
+) (*Data, error) {
+	return nil, nil
 }
 
 // NewData creates new tone

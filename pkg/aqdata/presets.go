@@ -1,3 +1,4 @@
+//go:generate msgp
 package aqdata
 
 import (
@@ -85,6 +86,8 @@ func GetAq1Presets(
 }
 
 // Aq2Preset defines preset for questalk2
+//
+//go:generate msgp
 type Aq2Preset int
 
 const (
