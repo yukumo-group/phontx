@@ -101,8 +101,6 @@ func (tone *Data) SetPhontDataFromFile(
 	if err != nil {
 		return err
 	}
-	tone = tone.SetPhontFileData(
-		data,
-	)
+	tone.SetPhontFileData(data)
 	return nil
 }

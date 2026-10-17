@@ -4,200 +4,86 @@ import (
 	"testing"
 )
 
-// TestAq1Presets tests presets for aquestalk 1
-func TestAq1Presets(t *testing.T) {
-	t.Parallel()
-	result, err := ToAq1Preset(0)
+// checks the preset list methods
+func checkPresetList[T presetLike](t *testing.T, list *presetList[T], first T) {
+	t.Helper()
+	// check the FromIndex method
+	got, err := list.FromIndex(0)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
-	if result != Aq1F1 {
-		t.Errorf(
-			"expected %s, got %s",
-			result.ToString(),
-			Aq1F1.ToString(),
-		)
+	if got != first {
+		t.Errorf("FromIndex(0) = %v, expected %v", got, first)
 	}
-	result, err = ToAq1Preset(114514)
-	if err == nil {
-		t.Error(
-			"expected to throw an error here!",
-		)
+	// check the FromIndex method with out of range index
+	for _, i := range []int{-1, list.Length(), 114514} {
+		if _, err := list.FromIndex(i); err == nil {
+			t.Errorf("FromIndex(%d) succeeded, expected error", i)
+		}
 	}
-	result, err = ToAq1Preset(-114514)
-	if err == nil {
-		t.Error(
-			"expected to throw an error here!",
-		)
-	}
-	result, err = ToAq1Preset(9)
-	if err == nil {
-		t.Error(
-			"expected to throw an error here!",
-		)
-	}
-	allAqs, err := GetAq1Presets(
-		-1,
-	)
+	// check the FromName method
+	got, err = list.FromName(first.ToString())
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
-	if len(allAqs) != 0 {
-		t.Errorf(
-			"expected the length of result to be %d, got %d",
-			0,
-			len(allAqs),
-		)
+	if got != first {
+		t.Errorf("FromName(%q) = %v, expected %v", first.ToString(), got, first)
 	}
-	allAqs, err = GetAq1Presets(
-		114514,
-	)
-	if err != nil {
-		t.Error(err)
+	// check the FromName method with missing preset
+	if _, err := list.FromName("missing"); err == nil {
+		t.Error("FromName(missing) succeeded, expected error")
 	}
-	if len(allAqs) != 9 {
-		t.Errorf(
-			"expected the length of result to be %d, got %d",
-			9,
-			len(allAqs),
-		)
-	}
-	allAqs, err = GetAq1Presets(
-		5,
-	)
-	if len(allAqs) != 5 {
-		t.Errorf(
-			"expected the length of result to be %d, got %d",
-			5,
-			len(allAqs),
-		)
+	// check the GetPresets method
+	n := list.Length()
+	for _, tc := range []struct{ limit, expected int }{
+		{-1, 0},
+		{5, min(5, n)},
+		{n, n},
+		{114514, n},
+	} {
+		if got := len(list.GetPresets(tc.limit)); got != tc.expected {
+			t.Errorf("GetPresets(%d) len = %d, expected %d", tc.limit, got, tc.expected)
+		}
 	}
 }
 
-// TestAq2Presets tests functions related to presets of aquestalk2
-func TestAq2Presets(t *testing.T) {
-	t.Parallel()
-	result0, err := ToAq2Preset(0)
-	if err != nil {
-		t.Error(err)
+func checkPreset[T presetLike](t *testing.T, preset T, name string) {
+	t.Helper()
+	// check the ToString method
+	if got := preset.ToString(); got != name {
+		t.Errorf("ToString() = %q, expected %q", got, name)
 	}
-	if result0 != Aq2AqYukkuri {
-		t.Errorf(
-			"expected %s, got %s",
-			result0.ToString(),
-			Aq2AqYukkuri.ToString(),
-		)
+	// check the Index method
+	if i, ok := preset.Index(); !ok || i != 0 {
+		t.Errorf("Index() = %d, %v, expected 0, true", i, ok)
 	}
-	_, err = ToAq2Preset(114514)
-	if err == nil {
-		t.Error(
-			"expected to throw an error here",
-		)
-	}
-	_, err = ToAq2Preset(-1)
-	if err == nil {
-		t.Error(
-			"expected to throw an error here",
-		)
-	}
-	allAqs, err := GetAq2Presets(
-		-1,
-	)
-	if err != nil {
-		t.Error(err)
-	}
-	if len(allAqs) != 0 {
-		t.Errorf(
-			"expected the length of result to be %d, got %d",
-			0,
-			len(allAqs),
-		)
-	}
-	allAqs, err = GetAq2Presets(
-		114514,
-	)
-	if err != nil {
-		t.Error(err)
-	}
-	if len(allAqs) != 16 {
-		t.Errorf(
-			"expected the length of result to be %d, got %d",
-			16,
-			len(allAqs),
-		)
-	}
-	allAqs, err = GetAq2Presets(
-		16,
-	)
-	if len(allAqs) != 16 {
-		t.Errorf(
-			"expected the length of result to be %d, got %d",
-			16,
-			len(allAqs),
-		)
+	// check the Index method with zero value
+	var zero T
+	if _, ok := zero.Index(); ok {
+		t.Error("Index() of zero value succeeded, expected false")
 	}
 }
 
-// TestAq10Presets tests presets of aquestalk10
-func TestAq10Presets(t *testing.T) {
+// tests the preset list methods
+func TestPresetMethods(t *testing.T) {
 	t.Parallel()
-	result0, err := ToAq10Preset(0)
-	if err != nil {
-		t.Error(err)
-	}
-	if result0 != Aq10Custom {
-		t.Errorf(
-			"expected %s, got %s",
-			result0.ToString(),
-			Aq10Custom.ToString(),
-		)
-	}
-	_, err = ToAq10Preset(114514)
-	if err == nil {
-		t.Error(
-			"expected to throw an error here",
-		)
-	}
-	_, err = ToAq10Preset(-1)
-	if err == nil {
-		t.Error(
-			"expected to throw an error here",
-		)
-	}
-	allAqs, err := GetAq10Presets(
-		-1,
-	)
-	if err != nil {
-		t.Error(err)
-	}
-	if len(allAqs) != 0 {
-		t.Errorf(
-			"expected the length of result to be %d, got %d",
-			0,
-			len(allAqs),
-		)
-	}
-	allAqs, err = GetAq10Presets(
-		114514,
-	)
-	if err != nil {
-		t.Error(err)
-	}
-	if len(allAqs) != 8 {
-		t.Errorf(
-			"expected the length of result to be %d, got %d",
-			8,
-			len(allAqs),
-		)
-	}
-	allAqs, err = GetAq10Presets(
-		8,
-	)
-	if len(allAqs) != 8 {
-		t.Errorf(
-			"expected the length of result to be %d, got %d",
-			8,
-			len(allAqs),
-		)
-	}
+	checkPreset(t, Aq1F1, "f1")
+	checkPresetList(t, &aq1Presets, Aq1F1)
+	checkPreset(t, Aq2AqYukkuri, "aq_yukkuri")
+	checkPresetList(t, &aq2Presets, Aq2AqYukkuri)
+	checkPreset(t, Aq10Custom, "custom")
+	checkPresetList(t, &aq10Presets, Aq10Custom)
+}
+
+// duplicate define method should panic
+func TestDefineDuplicatePanics(t *testing.T) {
+	t.Parallel()
+	var list presetList[Aq1Preset]
+	list.define("once")
+	defer func() {
+		if recover() == nil {
+			t.Error("duplicate define succeeded, expected panic")
+		}
+	}()
+	list.define("once")
 }
