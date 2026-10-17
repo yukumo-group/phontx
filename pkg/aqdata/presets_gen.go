@@ -8,23 +8,39 @@ import (
 
 // DecodeMsg implements msgp.Decodable
 func (z *Aq10Preset) DecodeMsg(dc *msgp.Reader) (err error) {
-	{
-		var zb0001 int
-		zb0001, err = dc.ReadInt()
+	var field []byte
+	_ = field
+	var zb0001 uint32
+	zb0001, err = dc.ReadMapHeader()
+	if err != nil {
+		err = msgp.WrapError(err)
+		return
+	}
+	for zb0001 > 0 {
+		zb0001--
+		field, err = dc.ReadMapKeyPtr()
 		if err != nil {
 			err = msgp.WrapError(err)
 			return
 		}
-		(*z) = Aq10Preset(zb0001)
+		switch msgp.UnsafeString(field) {
+		default:
+			err = dc.Skip()
+			if err != nil {
+				err = msgp.WrapError(err)
+				return
+			}
+		}
 	}
 	return
 }
 
 // EncodeMsg implements msgp.Encodable
 func (z Aq10Preset) EncodeMsg(en *msgp.Writer) (err error) {
-	err = en.WriteInt(int(z))
+	// map header, size 0
+	_ = z
+	err = en.Append(0x80)
 	if err != nil {
-		err = msgp.WrapError(err)
 		return
 	}
 	return
@@ -33,20 +49,37 @@ func (z Aq10Preset) EncodeMsg(en *msgp.Writer) (err error) {
 // MarshalMsg implements msgp.Marshaler
 func (z Aq10Preset) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
-	o = msgp.AppendInt(o, int(z))
+	// map header, size 0
+	_ = z
+	o = append(o, 0x80)
 	return
 }
 
 // UnmarshalMsg implements msgp.Unmarshaler
 func (z *Aq10Preset) UnmarshalMsg(bts []byte) (o []byte, err error) {
-	{
-		var zb0001 int
-		zb0001, bts, err = msgp.ReadIntBytes(bts)
+	var field []byte
+	_ = field
+	var zb0001 uint32
+	zb0001, bts, err = msgp.ReadMapHeaderBytes(bts)
+	if err != nil {
+		err = msgp.WrapError(err)
+		return
+	}
+	for zb0001 > 0 {
+		zb0001--
+		field, bts, err = msgp.ReadMapKeyZC(bts)
 		if err != nil {
 			err = msgp.WrapError(err)
 			return
 		}
-		(*z) = Aq10Preset(zb0001)
+		switch msgp.UnsafeString(field) {
+		default:
+			bts, err = msgp.Skip(bts)
+			if err != nil {
+				err = msgp.WrapError(err)
+				return
+			}
+		}
 	}
 	o = bts
 	return
@@ -54,29 +87,45 @@ func (z *Aq10Preset) UnmarshalMsg(bts []byte) (o []byte, err error) {
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z Aq10Preset) Msgsize() (s int) {
-	s = msgp.IntSize
+	s = 1
 	return
 }
 
 // DecodeMsg implements msgp.Decodable
 func (z *Aq1Preset) DecodeMsg(dc *msgp.Reader) (err error) {
-	{
-		var zb0001 int
-		zb0001, err = dc.ReadInt()
+	var field []byte
+	_ = field
+	var zb0001 uint32
+	zb0001, err = dc.ReadMapHeader()
+	if err != nil {
+		err = msgp.WrapError(err)
+		return
+	}
+	for zb0001 > 0 {
+		zb0001--
+		field, err = dc.ReadMapKeyPtr()
 		if err != nil {
 			err = msgp.WrapError(err)
 			return
 		}
-		(*z) = Aq1Preset(zb0001)
+		switch msgp.UnsafeString(field) {
+		default:
+			err = dc.Skip()
+			if err != nil {
+				err = msgp.WrapError(err)
+				return
+			}
+		}
 	}
 	return
 }
 
 // EncodeMsg implements msgp.Encodable
 func (z Aq1Preset) EncodeMsg(en *msgp.Writer) (err error) {
-	err = en.WriteInt(int(z))
+	// map header, size 0
+	_ = z
+	err = en.Append(0x80)
 	if err != nil {
-		err = msgp.WrapError(err)
 		return
 	}
 	return
@@ -85,20 +134,37 @@ func (z Aq1Preset) EncodeMsg(en *msgp.Writer) (err error) {
 // MarshalMsg implements msgp.Marshaler
 func (z Aq1Preset) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
-	o = msgp.AppendInt(o, int(z))
+	// map header, size 0
+	_ = z
+	o = append(o, 0x80)
 	return
 }
 
 // UnmarshalMsg implements msgp.Unmarshaler
 func (z *Aq1Preset) UnmarshalMsg(bts []byte) (o []byte, err error) {
-	{
-		var zb0001 int
-		zb0001, bts, err = msgp.ReadIntBytes(bts)
+	var field []byte
+	_ = field
+	var zb0001 uint32
+	zb0001, bts, err = msgp.ReadMapHeaderBytes(bts)
+	if err != nil {
+		err = msgp.WrapError(err)
+		return
+	}
+	for zb0001 > 0 {
+		zb0001--
+		field, bts, err = msgp.ReadMapKeyZC(bts)
 		if err != nil {
 			err = msgp.WrapError(err)
 			return
 		}
-		(*z) = Aq1Preset(zb0001)
+		switch msgp.UnsafeString(field) {
+		default:
+			bts, err = msgp.Skip(bts)
+			if err != nil {
+				err = msgp.WrapError(err)
+				return
+			}
+		}
 	}
 	o = bts
 	return
@@ -106,29 +172,45 @@ func (z *Aq1Preset) UnmarshalMsg(bts []byte) (o []byte, err error) {
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z Aq1Preset) Msgsize() (s int) {
-	s = msgp.IntSize
+	s = 1
 	return
 }
 
 // DecodeMsg implements msgp.Decodable
 func (z *Aq2Preset) DecodeMsg(dc *msgp.Reader) (err error) {
-	{
-		var zb0001 int
-		zb0001, err = dc.ReadInt()
+	var field []byte
+	_ = field
+	var zb0001 uint32
+	zb0001, err = dc.ReadMapHeader()
+	if err != nil {
+		err = msgp.WrapError(err)
+		return
+	}
+	for zb0001 > 0 {
+		zb0001--
+		field, err = dc.ReadMapKeyPtr()
 		if err != nil {
 			err = msgp.WrapError(err)
 			return
 		}
-		(*z) = Aq2Preset(zb0001)
+		switch msgp.UnsafeString(field) {
+		default:
+			err = dc.Skip()
+			if err != nil {
+				err = msgp.WrapError(err)
+				return
+			}
+		}
 	}
 	return
 }
 
 // EncodeMsg implements msgp.Encodable
 func (z Aq2Preset) EncodeMsg(en *msgp.Writer) (err error) {
-	err = en.WriteInt(int(z))
+	// map header, size 0
+	_ = z
+	err = en.Append(0x80)
 	if err != nil {
-		err = msgp.WrapError(err)
 		return
 	}
 	return
@@ -137,20 +219,37 @@ func (z Aq2Preset) EncodeMsg(en *msgp.Writer) (err error) {
 // MarshalMsg implements msgp.Marshaler
 func (z Aq2Preset) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
-	o = msgp.AppendInt(o, int(z))
+	// map header, size 0
+	_ = z
+	o = append(o, 0x80)
 	return
 }
 
 // UnmarshalMsg implements msgp.Unmarshaler
 func (z *Aq2Preset) UnmarshalMsg(bts []byte) (o []byte, err error) {
-	{
-		var zb0001 int
-		zb0001, bts, err = msgp.ReadIntBytes(bts)
+	var field []byte
+	_ = field
+	var zb0001 uint32
+	zb0001, bts, err = msgp.ReadMapHeaderBytes(bts)
+	if err != nil {
+		err = msgp.WrapError(err)
+		return
+	}
+	for zb0001 > 0 {
+		zb0001--
+		field, bts, err = msgp.ReadMapKeyZC(bts)
 		if err != nil {
 			err = msgp.WrapError(err)
 			return
 		}
-		(*z) = Aq2Preset(zb0001)
+		switch msgp.UnsafeString(field) {
+		default:
+			bts, err = msgp.Skip(bts)
+			if err != nil {
+				err = msgp.WrapError(err)
+				return
+			}
+		}
 	}
 	o = bts
 	return
@@ -158,6 +257,6 @@ func (z *Aq2Preset) UnmarshalMsg(bts []byte) (o []byte, err error) {
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z Aq2Preset) Msgsize() (s int) {
-	s = msgp.IntSize
+	s = 1
 	return
 }
