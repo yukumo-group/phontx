@@ -306,7 +306,7 @@ func (z *Data) UnmarshalMsg(bts []byte) (o []byte, err error) {
 				}
 			}
 		case "PhontFileData":
-			z.PhontFileData, bts, err = msgp.ReadBytesBytes(bts, z.PhontFileData)
+			z.PhontFileData, bts, err = msgp.ReadBytesZC(bts)
 			if err != nil {
 				err = msgp.WrapError(err, "PhontFileData")
 				return

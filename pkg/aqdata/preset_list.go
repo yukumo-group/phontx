@@ -1,68 +1,93 @@
+//go:generate msgp
 package aqdata
 
-import "fmt"
+import (
+	"fmt"
 
-type preset struct {
-	index int
-	name  string
+	"github.com/tinylib/msgp/msgp"
+)
+
+type Preset struct {
+	Index int
+	Name  string
 }
 
-func (p preset) ToString() string { return p.name }
+func (p Preset) ToString() string {
+	return p.Name
+}
 
-func (p preset) Index() (int, bool) {
-	if p.name == "" {
+func (p Preset) GetIndex() (int, bool) {
+	if p.Name == "" {
 		return 0, false
 	}
-	return p.index, true
+	return p.Index, true
 }
 
 // type constraint for preset
-type presetLike interface {
-	~struct{ preset }
+type PresetLike interface {
+	~struct{ Preset }
 	ToString() string
-	Index() (int, bool)
+	GetIndex() (int, bool)
+}
+
+// IsPresetsEqual checks if two presets are the same
+func IsPresetsEqual[T PresetLike](
+	preset1 *T,
+	preset2 *T,
+) bool {
+	if preset1 == nil && preset2 == nil {
+		return true
+	}
+	if preset1 != nil && preset2 != nil {
+		index1, hasName1 := (*preset1).GetIndex()
+		index2, hasName2 := (*preset1).GetIndex()
+		return (*preset1).ToString() == (*preset2).ToString() &&
+			index1 == index2 &&
+			hasName1 == hasName2
+	}
+	return false
 }
 
 // list of presets accepting generic preset type
-type presetList[T presetLike] struct {
-	presets []T
-	byName  map[string]T
+type PresetList[T PresetLike, _ msgp.RTFor[T]] struct {
+	Presets []T
+	ByName  map[string]T
 }
 
 // define a new preset
-func (l *presetList[T]) define(name string) T {
-	if l.byName == nil {
+func (l *PresetList[T, _]) define(name string) T {
+	if l.ByName == nil {
 		// init byName map if it is nil
-		l.byName = make(map[string]T)
+		l.ByName = make(map[string]T)
 	}
-	if _, ok := l.byName[name]; ok {
+	if _, ok := l.ByName[name]; ok {
 		// enough to panic
 		panic("duplicate preset " + name)
 	}
 	// create a new preset based on the preset type
-	p := T{preset{len(l.presets), name}}
-	l.presets = append(l.presets, p)
-	l.byName[name] = p
+	p := T{Preset{len(l.Presets), name}}
+	l.Presets = append(l.Presets, p)
+	l.ByName[name] = p
 	return p
 }
 
 // get the length of the preset list
-func (l *presetList[T]) Length() int { return len(l.presets) }
+func (l *PresetList[T, _]) Length() int { return len(l.Presets) }
 
 // get the preset by index
-func (l *presetList[T]) FromIndex(i int) (T, error) {
+func (l *PresetList[T, _]) FromIndex(i int) (T, error) {
 	// range check
 	if i < 0 || i >= l.Length() {
 		var zero T
 		return zero, fmt.Errorf("%d is out of range 0-%d", i, l.Length()-1)
 	}
-	return l.presets[i], nil
+	return l.Presets[i], nil
 }
 
 // get the preset by its name
-func (l *presetList[T]) FromName(name string) (T, error) {
+func (l *PresetList[T, _]) FromName(name string) (T, error) {
 	// lookup the preset by name
-	p, ok := l.byName[name]
+	p, ok := l.ByName[name]
 	if !ok {
 		var zero T
 		return zero, fmt.Errorf("preset %s not found", name)
@@ -71,7 +96,7 @@ func (l *presetList[T]) FromName(name string) (T, error) {
 }
 
 // get the presets up to the limit
-func (l *presetList[T]) GetPresets(limit int) []T {
+func (l *PresetList[T, _]) GetPresets(limit int) []T {
 	limit = min(max(limit, 0), l.Length())
-	return l.presets[:limit]
+	return l.Presets[:limit]
 }

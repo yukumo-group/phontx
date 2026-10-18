@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/yukumo-group/phontx/internal/bts"
 	"github.com/yukumo-group/phontx/pkg/aqdata"
 	"github.com/yukumo-group/phontx/pkg/custom"
 )
@@ -200,5 +201,68 @@ func TestAllowedEngine(t *testing.T) {
 		t.Error(
 			"expected to support aq10",
 		)
+	}
+}
+
+// TestDataReadLoad tests the read and load of data
+func TestDataReadLoad(t *testing.T) {
+	t.Parallel()
+	// Prepare data
+	const testDataPath string = "./testdata/aq_f1c.phont"
+	tmpDir := t.TempDir()
+	fileName := "test"
+	testCustomAq10Tone := custom.NewAq10CustomTone().WithFSC(
+		40,
+	).WithBase(
+		custom.M1E,
+	)
+	newData := NewData().SetAq1Preset(
+		aqdata.Aq1DVD,
+	).SetAq2Preset(
+		aqdata.Aq2AqDefo1,
+	).SetAq10Preset(
+		aqdata.Aq10Custom,
+	).SetAq10CustomTone(
+		testCustomAq10Tone,
+	)
+	err := newData.SetPhontDataFromFile(
+		testDataPath,
+	)
+	if err != nil {
+		t.Error(err)
+	}
+	// Load and save
+	filePath, err := newData.SaveFile(
+		tmpDir,
+		fileName,
+	)
+	if err != nil {
+		t.Error(err)
+	}
+	reloadedData, err := NewDataFromFile(
+		filePath,
+	)
+	if err != nil {
+		t.Error(err)
+	}
+	if !reloadedData.Equals(newData) {
+		t.Error(
+			"expected the loaded and new data to be the same",
+		)
+		if !bts.IsBytesSame(
+			reloadedData.PhontFileData,
+			newData.PhontFileData,
+		) {
+			t.Error(
+				"the two tones do not have the same phont data read",
+			)
+		}
+		if reloadedData.Aq1Preset != newData.Aq1Preset {
+			t.Errorf(
+				"expected %s, got %s",
+				newData.Aq1Preset.ToString(),
+				reloadedData.Aq1Preset.ToString(),
+			)
+		}
 	}
 }

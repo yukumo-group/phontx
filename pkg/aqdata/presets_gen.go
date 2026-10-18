@@ -24,6 +24,12 @@ func (z *Aq10Preset) DecodeMsg(dc *msgp.Reader) (err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
+		case "Preset":
+			err = z.Preset.DecodeMsg(dc)
+			if err != nil {
+				err = msgp.WrapError(err, "Preset")
+				return
+			}
 		default:
 			err = dc.Skip()
 			if err != nil {
@@ -36,22 +42,32 @@ func (z *Aq10Preset) DecodeMsg(dc *msgp.Reader) (err error) {
 }
 
 // EncodeMsg implements msgp.Encodable
-func (z Aq10Preset) EncodeMsg(en *msgp.Writer) (err error) {
-	// map header, size 0
-	_ = z
-	err = en.Append(0x80)
+func (z *Aq10Preset) EncodeMsg(en *msgp.Writer) (err error) {
+	// map header, size 1
+	// write "Preset"
+	err = en.Append(0x81, 0xa6, 0x50, 0x72, 0x65, 0x73, 0x65, 0x74)
 	if err != nil {
+		return
+	}
+	err = z.Preset.EncodeMsg(en)
+	if err != nil {
+		err = msgp.WrapError(err, "Preset")
 		return
 	}
 	return
 }
 
 // MarshalMsg implements msgp.Marshaler
-func (z Aq10Preset) MarshalMsg(b []byte) (o []byte, err error) {
+func (z *Aq10Preset) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
-	// map header, size 0
-	_ = z
-	o = append(o, 0x80)
+	// map header, size 1
+	// string "Preset"
+	o = append(o, 0x81, 0xa6, 0x50, 0x72, 0x65, 0x73, 0x65, 0x74)
+	o, err = z.Preset.MarshalMsg(o)
+	if err != nil {
+		err = msgp.WrapError(err, "Preset")
+		return
+	}
 	return
 }
 
@@ -73,6 +89,12 @@ func (z *Aq10Preset) UnmarshalMsg(bts []byte) (o []byte, err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
+		case "Preset":
+			bts, err = z.Preset.UnmarshalMsg(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "Preset")
+				return
+			}
 		default:
 			bts, err = msgp.Skip(bts)
 			if err != nil {
@@ -86,8 +108,8 @@ func (z *Aq10Preset) UnmarshalMsg(bts []byte) (o []byte, err error) {
 }
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
-func (z Aq10Preset) Msgsize() (s int) {
-	s = 1
+func (z *Aq10Preset) Msgsize() (s int) {
+	s = 1 + 7 + z.Preset.Msgsize()
 	return
 }
 
@@ -109,6 +131,12 @@ func (z *Aq1Preset) DecodeMsg(dc *msgp.Reader) (err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
+		case "Preset":
+			err = z.Preset.DecodeMsg(dc)
+			if err != nil {
+				err = msgp.WrapError(err, "Preset")
+				return
+			}
 		default:
 			err = dc.Skip()
 			if err != nil {
@@ -121,22 +149,32 @@ func (z *Aq1Preset) DecodeMsg(dc *msgp.Reader) (err error) {
 }
 
 // EncodeMsg implements msgp.Encodable
-func (z Aq1Preset) EncodeMsg(en *msgp.Writer) (err error) {
-	// map header, size 0
-	_ = z
-	err = en.Append(0x80)
+func (z *Aq1Preset) EncodeMsg(en *msgp.Writer) (err error) {
+	// map header, size 1
+	// write "Preset"
+	err = en.Append(0x81, 0xa6, 0x50, 0x72, 0x65, 0x73, 0x65, 0x74)
 	if err != nil {
+		return
+	}
+	err = z.Preset.EncodeMsg(en)
+	if err != nil {
+		err = msgp.WrapError(err, "Preset")
 		return
 	}
 	return
 }
 
 // MarshalMsg implements msgp.Marshaler
-func (z Aq1Preset) MarshalMsg(b []byte) (o []byte, err error) {
+func (z *Aq1Preset) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
-	// map header, size 0
-	_ = z
-	o = append(o, 0x80)
+	// map header, size 1
+	// string "Preset"
+	o = append(o, 0x81, 0xa6, 0x50, 0x72, 0x65, 0x73, 0x65, 0x74)
+	o, err = z.Preset.MarshalMsg(o)
+	if err != nil {
+		err = msgp.WrapError(err, "Preset")
+		return
+	}
 	return
 }
 
@@ -158,6 +196,12 @@ func (z *Aq1Preset) UnmarshalMsg(bts []byte) (o []byte, err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
+		case "Preset":
+			bts, err = z.Preset.UnmarshalMsg(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "Preset")
+				return
+			}
 		default:
 			bts, err = msgp.Skip(bts)
 			if err != nil {
@@ -171,8 +215,8 @@ func (z *Aq1Preset) UnmarshalMsg(bts []byte) (o []byte, err error) {
 }
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
-func (z Aq1Preset) Msgsize() (s int) {
-	s = 1
+func (z *Aq1Preset) Msgsize() (s int) {
+	s = 1 + 7 + z.Preset.Msgsize()
 	return
 }
 
@@ -194,6 +238,12 @@ func (z *Aq2Preset) DecodeMsg(dc *msgp.Reader) (err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
+		case "Preset":
+			err = z.Preset.DecodeMsg(dc)
+			if err != nil {
+				err = msgp.WrapError(err, "Preset")
+				return
+			}
 		default:
 			err = dc.Skip()
 			if err != nil {
@@ -206,22 +256,32 @@ func (z *Aq2Preset) DecodeMsg(dc *msgp.Reader) (err error) {
 }
 
 // EncodeMsg implements msgp.Encodable
-func (z Aq2Preset) EncodeMsg(en *msgp.Writer) (err error) {
-	// map header, size 0
-	_ = z
-	err = en.Append(0x80)
+func (z *Aq2Preset) EncodeMsg(en *msgp.Writer) (err error) {
+	// map header, size 1
+	// write "Preset"
+	err = en.Append(0x81, 0xa6, 0x50, 0x72, 0x65, 0x73, 0x65, 0x74)
 	if err != nil {
+		return
+	}
+	err = z.Preset.EncodeMsg(en)
+	if err != nil {
+		err = msgp.WrapError(err, "Preset")
 		return
 	}
 	return
 }
 
 // MarshalMsg implements msgp.Marshaler
-func (z Aq2Preset) MarshalMsg(b []byte) (o []byte, err error) {
+func (z *Aq2Preset) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
-	// map header, size 0
-	_ = z
-	o = append(o, 0x80)
+	// map header, size 1
+	// string "Preset"
+	o = append(o, 0x81, 0xa6, 0x50, 0x72, 0x65, 0x73, 0x65, 0x74)
+	o, err = z.Preset.MarshalMsg(o)
+	if err != nil {
+		err = msgp.WrapError(err, "Preset")
+		return
+	}
 	return
 }
 
@@ -243,6 +303,12 @@ func (z *Aq2Preset) UnmarshalMsg(bts []byte) (o []byte, err error) {
 			return
 		}
 		switch msgp.UnsafeString(field) {
+		case "Preset":
+			bts, err = z.Preset.UnmarshalMsg(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "Preset")
+				return
+			}
 		default:
 			bts, err = msgp.Skip(bts)
 			if err != nil {
@@ -256,7 +322,7 @@ func (z *Aq2Preset) UnmarshalMsg(bts []byte) (o []byte, err error) {
 }
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
-func (z Aq2Preset) Msgsize() (s int) {
-	s = 1
+func (z *Aq2Preset) Msgsize() (s int) {
+	s = 1 + 7 + z.Preset.Msgsize()
 	return
 }
