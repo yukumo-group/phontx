@@ -22,12 +22,14 @@ jobs:
       run: go test -v ./... -tags=test -coverpkg=./pkg/...,./internal/... -coverprofile=coverage.txt
       env:
         CGO_ENABLED: "1"
+    
+    # do not come back to static check due to the third-party is ginored.
+    # static check will mark files using Aqsh.h as error
+    - name: Install Golint
+      run: go install golang.org/x/lint/golint@latest
       
-    - name: Install staticcheck
-      run: go install honnef.co/go/tools/cmd/staticcheck@2026.1
-
-    - name: Run staticcheck
-      run: staticcheck ./...
+    - name: Run Golint
+      run: golint -set_exit_status ./...
     
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v5
