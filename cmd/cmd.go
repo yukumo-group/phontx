@@ -26,6 +26,13 @@ You can:
 	},
 }
 
+// init adds subcommands
+func init() {
+	rootCommand.AddCommand(
+		createPhontxCommand,
+	)
+}
+
 // Execute executes the command
 func Execute() error {
 	return rootCommand.Execute()

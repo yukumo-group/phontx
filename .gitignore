@@ -33,3 +33,6 @@ go.work.sum
 
 # Third parties
 third-party
+
+# Vendor
+vendor
