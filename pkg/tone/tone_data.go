@@ -1,4 +1,3 @@
-//go:generate msgp
 package tone
 
 import (

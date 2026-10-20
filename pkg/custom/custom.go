@@ -1,4 +1,3 @@
-//go:generate msgp
 package custom
 
 // Aq10CustomTone defines the aq10 tone by custom.

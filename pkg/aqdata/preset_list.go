@@ -1,4 +1,3 @@
-//go:generate msgp
 package aqdata
 
 import (
@@ -7,15 +6,18 @@ import (
 	"github.com/tinylib/msgp/msgp"
 )
 
+// Preset define single preset
 type Preset struct {
 	Index int
 	Name  string
 }
 
+// ToString gets the name of the preset
 func (p Preset) ToString() string {
 	return p.Name
 }
 
+// GetIndex gets the index for preset
 func (p Preset) GetIndex() (int, bool) {
 	if p.Name == "" {
 		return 0, false
@@ -23,7 +25,7 @@ func (p Preset) GetIndex() (int, bool) {
 	return p.Index, true
 }
 
-// type constraint for preset
+// PresetLike defines type constraint for preset
 type PresetLike interface {
 	~struct{ Preset }
 	ToString() string
@@ -48,7 +50,7 @@ func IsPresetsEqual[T PresetLike](
 	return false
 }
 
-// list of presets accepting generic preset type
+// PresetList defines list of presets accepting generic preset type
 type PresetList[T PresetLike, _ msgp.RTFor[T]] struct {
 	Presets []T
 	ByName  map[string]T
@@ -71,10 +73,10 @@ func (l *PresetList[T, _]) define(name string) T {
 	return p
 }
 
-// get the length of the preset list
+// Length gets the length of the preset list
 func (l *PresetList[T, _]) Length() int { return len(l.Presets) }
 
-// get the preset by index
+// FromIndex gets the preset by index
 func (l *PresetList[T, _]) FromIndex(i int) (T, error) {
 	// range check
 	if i < 0 || i >= l.Length() {
@@ -84,7 +86,7 @@ func (l *PresetList[T, _]) FromIndex(i int) (T, error) {
 	return l.Presets[i], nil
 }
 
-// get the preset by its name
+// FromName gets the preset by its name
 func (l *PresetList[T, _]) FromName(name string) (T, error) {
 	// lookup the preset by name
 	p, ok := l.ByName[name]
@@ -95,7 +97,7 @@ func (l *PresetList[T, _]) FromName(name string) (T, error) {
 	return p, nil
 }
 
-// get the presets up to the limit
+// GetPresets get the presets up to the limit
 func (l *PresetList[T, _]) GetPresets(limit int) []T {
 	limit = min(max(limit, 0), l.Length())
 	return l.Presets[:limit]
