@@ -3,6 +3,9 @@ package ui
 import (
 	"fmt"
 	"strings"
+
+	"github.com/tinylib/msgp/msgp"
+	"github.com/yukumo-group/phontx/pkg/aqdata"
 )
 
 // GetTrueFalsePrompt gets the prompt for true/false
@@ -37,7 +40,7 @@ func GetAnswerForYesNoQuestion(
 		defaultValue,
 	)
 	fmt.Printf(
-		"%s %s:",
+		"%s %s:\n",
 		prompt,
 		trueFalsePrompt,
 	)
@@ -58,4 +61,33 @@ func GetAnswerForYesNoQuestion(
 			lowerAns,
 		)
 	}
+}
+
+// GetPresetByUI gets the preset by ui
+func GetPresetByUI[T aqdata.PresetLike, PT msgp.RTFor[T]](
+	presetList *aqdata.PresetList[T, PT],
+) (T, error) {
+	// Get data
+	presetsList := presetList.Length()
+	allPresets := presetList.GetPresets(
+		presetsList,
+	)
+	// Presents all the data
+	fmt.Printf(
+		"Here are the available presets for engine %s: \n",
+		presetList.GetListName(),
+	)
+	for _, preset := range allPresets {
+		fmt.Println(
+			preset.ToString(),
+		)
+	}
+	// Input & get the result
+	fmt.Println(
+		"Input the preset you want to use: ",
+	)
+	var selectedPreset string
+	fmt.Scan(&selectedPreset)
+	result, err := presetList.FromName(selectedPreset)
+	return result, err
 }

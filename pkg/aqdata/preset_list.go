@@ -52,8 +52,25 @@ func IsPresetsEqual[T PresetLike](
 
 // PresetList defines list of presets accepting generic preset type
 type PresetList[T PresetLike, _ msgp.RTFor[T]] struct {
-	Presets []T
-	ByName  map[string]T
+	Presets  []T
+	ByName   map[string]T
+	ListName string
+}
+
+// NewPreset creates new preset
+func NewPreset[T PresetLike, PT msgp.RTFor[T]](
+	listName string,
+) *PresetList[T, PT] {
+	return &PresetList[T, PT]{
+		Presets:  []T{},
+		ByName:   map[string]T{},
+		ListName: listName,
+	}
+}
+
+// GetListName gets the name for the preset list
+func (l *PresetList[T, _]) GetListName() string {
+	return l.ListName
 }
 
 // define a new preset
