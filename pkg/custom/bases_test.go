@@ -86,3 +86,33 @@ func TestBases(t *testing.T) {
 		)
 	}
 }
+
+// TestConvertIntToBase tests the convertion from integer to base
+func TestConvertIntToBase(t *testing.T) {
+	t.Parallel()
+	expectedBases := []Aq10Base{
+		F1E,
+		F2E,
+		M1E,
+	}
+	fetchedBases, err := GetAllAq10Bases(3)
+	if err != nil {
+		t.Error(err)
+	}
+	for i := range fetchedBases {
+		if i == len(expectedBases) {
+			t.Fatalf(
+				"i became larger than length of expected bases %d",
+				len(expectedBases),
+			)
+		}
+		if fetchedBases[i] != expectedBases[i] {
+			t.Errorf(
+				"in idx %d, expected %s, got %s",
+				i,
+				expectedBases[i].ToString(),
+				fetchedBases[i].ToString(),
+			)
+		}
+	}
+}
