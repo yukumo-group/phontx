@@ -3,9 +3,11 @@ package ui
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/1Vewton/structdisplay/pkg/display"
+	"github.com/1Vewton/structdisplay/pkg/ignore"
 	"github.com/tinylib/msgp/msgp"
 	"github.com/yukumo-group/phontx/pkg/aqdata"
 	"github.com/yukumo-group/phontx/pkg/custom"
@@ -250,8 +252,14 @@ func GetAq10CustomToneByUI() (*custom.Aq10CustomTone, error) {
 func ToneToString(
 	target *tone.Data,
 ) (string, error) {
+	sampleBytes := []byte{}
+	sampleType := reflect.TypeOf(sampleBytes)
+	ignoredList := ignore.NewTermsIgnoredSlice()
+	ignoredList.AddTypeByType(sampleType)
 	return display.NewConverter().WithRecursionLimit(
 		99,
+	).WithIgnoredTerms(
+		ignoredList,
 	).ConvertAnyData(
 		"ToneData",
 		"",

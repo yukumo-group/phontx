@@ -29,6 +29,10 @@ func NewDataFromFile(
 	filePath string,
 ) (*Data, error) {
 	data := NewData()
+	_, err := os.Stat(filePath)
+	if err != nil {
+		return nil, err
+	}
 	bytesData, err := os.ReadFile(filePath)
 	if err != nil {
 		return data, err
