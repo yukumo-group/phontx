@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/yukumo-group/phontx/internal/ui"
 	"github.com/yukumo-group/phontx/pkg/aqdata"
-	"github.com/yukumo-group/phontx/pkg/custom"
 	"github.com/yukumo-group/phontx/pkg/tone"
 )
 
@@ -123,7 +122,10 @@ createPhontx command creates phontx, which is a tone data allowed for three vers
 				)
 			} else {
 				// Set custom tone
-				customTone := custom.NewAq10CustomTone()
+				customTone, err := ui.GetAq10CustomToneByUI()
+				if err != nil {
+					panic(err)
+				}
 				newTone = newTone.SetAq10CustomTone(
 					customTone,
 				)

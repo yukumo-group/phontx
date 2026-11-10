@@ -6,6 +6,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// PhontxFilePath defines the file path of phontx file
+var PhontxFilePath string
+
 // rootCommand defines the root command
 var rootCommand = &cobra.Command{
 	Use:   "phontx",
@@ -28,8 +31,19 @@ You can:
 
 // init adds subcommands
 func init() {
+	readPhontxCommand.PersistentFlags().StringVarP(
+		&PhontxFilePath,
+		"filePath",
+		"f",
+		"",
+		"path to phontx file",
+	)
+	readPhontxCommand.AddCommand(
+		showEngineInfo,
+	)
 	rootCommand.AddCommand(
 		createPhontxCommand,
+		readPhontxCommand,
 	)
 }
 

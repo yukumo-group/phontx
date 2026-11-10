@@ -25,7 +25,7 @@ func (z *Aq10CustomTone) DecodeMsg(dc *msgp.Reader) (err error) {
 		}
 		switch msgp.UnsafeString(field) {
 		case "Base":
-			z.Base, err = dc.ReadInt()
+			err = z.Base.DecodeMsg(dc)
 			if err != nil {
 				err = msgp.WrapError(err, "Base")
 				return
@@ -97,7 +97,7 @@ func (z *Aq10CustomTone) EncodeMsg(en *msgp.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	err = en.WriteInt(z.Base)
+	err = z.Base.EncodeMsg(en)
 	if err != nil {
 		err = msgp.WrapError(err, "Base")
 		return
@@ -165,7 +165,11 @@ func (z *Aq10CustomTone) MarshalMsg(b []byte) (o []byte, err error) {
 	// map header, size 5
 	// string "Base"
 	o = append(o, 0x85, 0xa4, 0x42, 0x61, 0x73, 0x65)
-	o = msgp.AppendInt(o, z.Base)
+	o, err = z.Base.MarshalMsg(o)
+	if err != nil {
+		err = msgp.WrapError(err, "Base")
+		return
+	}
 	// string "LMD"
 	o = append(o, 0xa3, 0x4c, 0x4d, 0x44)
 	o = msgp.AppendInt(o, z.LMD)
@@ -208,7 +212,7 @@ func (z *Aq10CustomTone) UnmarshalMsg(bts []byte) (o []byte, err error) {
 		}
 		switch msgp.UnsafeString(field) {
 		case "Base":
-			z.Base, bts, err = msgp.ReadIntBytes(bts)
+			bts, err = z.Base.UnmarshalMsg(bts)
 			if err != nil {
 				err = msgp.WrapError(err, "Base")
 				return
@@ -273,7 +277,7 @@ func (z *Aq10CustomTone) UnmarshalMsg(bts []byte) (o []byte, err error) {
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z *Aq10CustomTone) Msgsize() (s int) {
-	s = 1 + 5 + msgp.IntSize + 4 + msgp.IntSize + 4 + msgp.IntSize + 6
+	s = 1 + 5 + z.Base.Msgsize() + 4 + msgp.IntSize + 4 + msgp.IntSize + 6
 	if z.Pitch == nil {
 		s += msgp.NilSize
 	} else {

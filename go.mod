@@ -1,8 +1,9 @@
 module github.com/yukumo-group/phontx
 
-go 1.26.0
+go 1.27.0
 
 require (
+	github.com/1Vewton/structdisplay v0.1.0
 	github.com/spf13/cobra v1.10.2
 	github.com/tinylib/msgp v1.6.5
 )

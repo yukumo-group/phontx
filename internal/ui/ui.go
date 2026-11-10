@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/1Vewton/structdisplay/pkg/display"
 	"github.com/tinylib/msgp/msgp"
 	"github.com/yukumo-group/phontx/pkg/aqdata"
 	"github.com/yukumo-group/phontx/pkg/custom"
+	"github.com/yukumo-group/phontx/pkg/tone"
 )
 
 // GetTrueFalsePrompt gets the prompt for true/false
@@ -116,10 +118,25 @@ type DataNeededDefinition[T any] struct {
 	ValuePointer *T
 }
 
-// GetToneParams gets all the params for a
-func GetToneParams[T any](
-	param DataNeededDefinition[T],
-) error {
+// NewDataNeededDefinitionWithCF creates new data needed definition
+func NewDataNeededDefinitionWithCF[T any](
+	paramName string,
+	definition string,
+	ceil T,
+	floor T,
+	valuePointer *T,
+) DataNeededDefinition[T] {
+	return DataNeededDefinition[T]{
+		ParamName:    paramName,
+		Definition:   definition,
+		Ceil:         &ceil,
+		Floor:        &floor,
+		ValuePointer: valuePointer,
+	}
+}
+
+// GetData gets all the params for a
+func (param DataNeededDefinition[T]) GetData() error {
 	var showData T
 	prompt := fmt.Sprintf(
 		"Input %T value for %s, %s",
@@ -144,6 +161,19 @@ func GetToneParams[T any](
 		)
 	}
 	*param.ValuePointer = data
+	return nil
+}
+
+// GetMultipleParams gets multiple params
+func GetMultipleParams[T any](
+	params ...DataNeededDefinition[T],
+) error {
+	for _, param := range params {
+		err := param.GetData()
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -174,16 +204,95 @@ func GetAq10CustomToneByUI() (*custom.Aq10CustomTone, error) {
 		return nil, err
 	}
 	// LMD
-	customLmd, err := FetchVal[int](
-		"input the lmd (pitch 1) of the custom tone",
+	customLmd := 0
+	customFsc := 50
+	customPitch := 20
+	customAccent := 0
+	err = GetMultipleParams(
+		NewDataNeededDefinitionWithCF(
+			"LMD",
+			"pitch 1",
+			0,
+			200,
+			&customLmd,
+		),
+		NewDataNeededDefinitionWithCF(
+			"FSC",
+			"pitch 2",
+			50,
+			200,
+			&customFsc,
+		),
+		NewDataNeededDefinitionWithCF(
+			"Pitch",
+			"pitch of the tone",
+			20,
+			200,
+			&customPitch,
+		),
+		NewDataNeededDefinitionWithCF(
+			"Accent",
+			"the strength of the tone",
+			0,
+			200,
+			&customAccent,
+		),
 	)
-	if err != nil {
-		return nil, err
-	}
 	newCustomTone := custom.NewAq10CustomTone().WithBase(
 		selectedBase,
 	).WithLMD(
 		customLmd,
 	)
 	return newCustomTone, nil
+}
+
+// ToneToString converts tone to string
+func ToneToString(
+	target *tone.Data,
+) (string, error) {
+	return display.NewConverter().WithRecursionLimit(
+		99,
+	).ConvertAnyData(
+		"ToneData",
+		"",
+		target,
+		0,
+	)
+}
+
+// ShowEngineSupportOrNot shows whether a version of engine is supported or not
+func ShowEngineSupportOrNot(
+	version int,
+	isSupported bool,
+) {
+	var supportedText string
+	if isSupported {
+		supportedText = "Supported"
+	} else {
+		supportedText = "Not Supported"
+	}
+	fmt.Printf(
+		"Aquestalk%d: %s\n",
+		version,
+		supportedText,
+	)
+}
+
+// ShowEngineInfo shows the engine info for a phont file
+func ShowEngineInfo(
+	target *tone.Data,
+) {
+	allowedEngine := target.GetAllowedEngines()
+	ShowEngineSupportOrNot(
+		1,
+		allowedEngine.Aq1,
+	)
+	ShowEngineSupportOrNot(
+		2,
+		allowedEngine.Aq2,
+	)
+	ShowEngineSupportOrNot(
+		10,
+		allowedEngine.Aq10,
+	)
 }

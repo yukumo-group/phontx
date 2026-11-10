@@ -4,7 +4,7 @@ package custom
 // Pitch and Accent depends on base.
 type Aq10CustomTone struct {
 	// 0-2
-	Base int
+	Base Aq10Base
 	// 0-200, default: 100
 	LMD int
 	// 50-200, default: 100
@@ -27,7 +27,7 @@ func NewAq10CustomTone() *Aq10CustomTone {
 func (cfg *Aq10CustomTone) WithBase(
 	data Aq10Base,
 ) *Aq10CustomTone {
-	cfg.Base = int(data)
+	cfg.Base = data
 	return cfg
 }
 
