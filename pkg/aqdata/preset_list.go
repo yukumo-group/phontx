@@ -7,8 +7,10 @@ import (
 )
 
 // Preset define single preset
+//
+//go:generate msgp
 type Preset struct {
-	Index int
+	Index int32
 	Name  string
 }
 
@@ -18,7 +20,7 @@ func (p Preset) ToString() string {
 }
 
 // GetIndex gets the index for preset
-func (p Preset) GetIndex() (int, bool) {
+func (p Preset) GetIndex() (int32, bool) {
 	if p.Name == "" {
 		return 0, false
 	}
@@ -29,7 +31,7 @@ func (p Preset) GetIndex() (int, bool) {
 type PresetLike interface {
 	~struct{ Preset }
 	ToString() string
-	GetIndex() (int, bool)
+	GetIndex() (int32, bool)
 }
 
 // IsPresetsEqual checks if two presets are the same
@@ -51,6 +53,8 @@ func IsPresetsEqual[T PresetLike](
 }
 
 // PresetList defines list of presets accepting generic preset type
+//
+//go:generate msgp
 type PresetList[T PresetLike, _ msgp.RTFor[T]] struct {
 	Presets  []T
 	ByName   map[string]T
@@ -84,7 +88,7 @@ func (l *PresetList[T, _]) define(name string) T {
 		panic("duplicate preset " + name)
 	}
 	// create a new preset based on the preset type
-	p := T{Preset{len(l.Presets), name}}
+	p := T{Preset{int32(len(l.Presets)), name}}
 	l.Presets = append(l.Presets, p)
 	l.ByName[name] = p
 	return p

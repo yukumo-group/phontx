@@ -2,17 +2,18 @@ package custom
 
 // Aq10CustomTone defines the aq10 tone by custom.
 // Pitch and Accent depends on base.
+//go:generate msgp
 type Aq10CustomTone struct {
 	// 0-2
 	Base Aq10Base
 	// 0-200, default: 100
-	LMD int
+	LMD int32
 	// 50-200, default: 100
-	FSC int
+	FSC int32
 	// 20-200
-	Pitch *int
+	Pitch *int32
 	// 0-200
-	Accent *int
+	Accent *int32
 }
 
 // NewAq10CustomTone creates new aquestalk10 config
@@ -33,7 +34,7 @@ func (cfg *Aq10CustomTone) WithBase(
 
 // WithPitch sets pitch for config
 func (cfg *Aq10CustomTone) WithPitch(
-	data int,
+	data int32,
 ) *Aq10CustomTone {
 	realData := min(max(data, 20), 200)
 	cfg.Pitch = &realData
@@ -42,7 +43,7 @@ func (cfg *Aq10CustomTone) WithPitch(
 
 // WithAccent sets pitch for config
 func (cfg *Aq10CustomTone) WithAccent(
-	data int,
+	data int32,
 ) *Aq10CustomTone {
 	realData := min(max(data, 0), 200)
 	cfg.Accent = &realData
@@ -51,7 +52,7 @@ func (cfg *Aq10CustomTone) WithAccent(
 
 // WithLMD sets lmd for config
 func (cfg *Aq10CustomTone) WithLMD(
-	data int,
+	data int32,
 ) *Aq10CustomTone {
 	realData := min(max(data, 0), 200)
 	cfg.LMD = realData
@@ -60,7 +61,7 @@ func (cfg *Aq10CustomTone) WithLMD(
 
 // WithFSC sets fsc for config
 func (cfg *Aq10CustomTone) WithFSC(
-	data int,
+	data int32,
 ) *Aq10CustomTone {
 	realData := min(max(data, 50), 200)
 	cfg.FSC = realData

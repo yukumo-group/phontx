@@ -9,7 +9,7 @@ import (
 func TestAquesVersion(t *testing.T) {
 	t.Parallel()
 	for _, tc := range []struct {
-		n    int
+		n    int32
 		ver  AquesVersion
 		text string
 	}{
@@ -27,7 +27,7 @@ func TestAquesVersion(t *testing.T) {
 			t.Errorf("ToString(%v) = %q, expected %q", tc.ver, got, tc.text)
 		}
 	}
-	for _, n := range []int{-1, 0, 3, 114514} {
+	for _, n := range []int32{-1, 0, 3, 114514} {
 		if got := ToAquesVersion(n); got != AqVer2 {
 			t.Errorf("ToAquesVersion(%d) = %v, expected %v", n, got, AqVer2)
 		}

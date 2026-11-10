@@ -1,7 +1,8 @@
 package aqdata
 
-// AquesVersion defines the version of aquestalke
-type AquesVersion int
+// AquesVersion defines the version of aquestalk
+//go:generate msgp
+type AquesVersion int32
 
 const (
 	// AqVer1 defines version of aquestalk1
@@ -14,7 +15,7 @@ const (
 
 // ToAquesVersion converts integer to aques version
 func ToAquesVersion(
-	data int,
+	data int32,
 ) AquesVersion {
 	switch data {
 	case 1:
@@ -43,7 +44,7 @@ func (version AquesVersion) ToString() string {
 }
 
 // ToInt converts the version to int
-func (version AquesVersion) ToInt() int {
+func (version AquesVersion) ToInt() int32 {
 	switch version {
 	case AqVer1:
 		return 1

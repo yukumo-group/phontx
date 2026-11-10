@@ -25,7 +25,7 @@ func (z *Preset) DecodeMsg(dc *msgp.Reader) (err error) {
 		}
 		switch msgp.UnsafeString(field) {
 		case "Index":
-			z.Index, err = dc.ReadInt()
+			z.Index, err = dc.ReadInt32()
 			if err != nil {
 				err = msgp.WrapError(err, "Index")
 				return
@@ -55,7 +55,7 @@ func (z Preset) EncodeMsg(en *msgp.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	err = en.WriteInt(z.Index)
+	err = en.WriteInt32(z.Index)
 	if err != nil {
 		err = msgp.WrapError(err, "Index")
 		return
@@ -79,7 +79,7 @@ func (z Preset) MarshalMsg(b []byte) (o []byte, err error) {
 	// map header, size 2
 	// string "Index"
 	o = append(o, 0x82, 0xa5, 0x49, 0x6e, 0x64, 0x65, 0x78)
-	o = msgp.AppendInt(o, z.Index)
+	o = msgp.AppendInt32(o, z.Index)
 	// string "Name"
 	o = append(o, 0xa4, 0x4e, 0x61, 0x6d, 0x65)
 	o = msgp.AppendString(o, z.Name)
@@ -105,7 +105,7 @@ func (z *Preset) UnmarshalMsg(bts []byte) (o []byte, err error) {
 		}
 		switch msgp.UnsafeString(field) {
 		case "Index":
-			z.Index, bts, err = msgp.ReadIntBytes(bts)
+			z.Index, bts, err = msgp.ReadInt32Bytes(bts)
 			if err != nil {
 				err = msgp.WrapError(err, "Index")
 				return
@@ -130,7 +130,7 @@ func (z *Preset) UnmarshalMsg(bts []byte) (o []byte, err error) {
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z Preset) Msgsize() (s int) {
-	s = 1 + 6 + msgp.IntSize + 5 + msgp.StringPrefixSize + len(z.Name)
+	s = 1 + 6 + msgp.Int32Size + 5 + msgp.StringPrefixSize + len(z.Name)
 	return
 }
 
@@ -199,6 +199,12 @@ func (z *PresetList[T, _RT2]) DecodeMsg(dc *msgp.Reader) (err error) {
 				}
 				z.ByName[za0002] = za0003
 			}
+		case "ListName":
+			z.ListName, err = dc.ReadString()
+			if err != nil {
+				err = msgp.WrapError(err, "ListName")
+				return
+			}
 		default:
 			err = dc.Skip()
 			if err != nil {
@@ -212,9 +218,9 @@ func (z *PresetList[T, _RT2]) DecodeMsg(dc *msgp.Reader) (err error) {
 
 // EncodeMsg implements msgp.Encodable
 func (z *PresetList[T, _RT2]) EncodeMsg(en *msgp.Writer) (err error) {
-	// map header, size 2
+	// map header, size 3
 	// write "Presets"
-	err = en.Append(0x82, 0xa7, 0x50, 0x72, 0x65, 0x73, 0x65, 0x74, 0x73)
+	err = en.Append(0x83, 0xa7, 0x50, 0x72, 0x65, 0x73, 0x65, 0x74, 0x73)
 	if err != nil {
 		return
 	}
@@ -252,15 +258,25 @@ func (z *PresetList[T, _RT2]) EncodeMsg(en *msgp.Writer) (err error) {
 			return
 		}
 	}
+	// write "ListName"
+	err = en.Append(0xa8, 0x4c, 0x69, 0x73, 0x74, 0x4e, 0x61, 0x6d, 0x65)
+	if err != nil {
+		return
+	}
+	err = en.WriteString(z.ListName)
+	if err != nil {
+		err = msgp.WrapError(err, "ListName")
+		return
+	}
 	return
 }
 
 // MarshalMsg implements msgp.Marshaler
 func (z *PresetList[T, _RT2]) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
-	// map header, size 2
+	// map header, size 3
 	// string "Presets"
-	o = append(o, 0x82, 0xa7, 0x50, 0x72, 0x65, 0x73, 0x65, 0x74, 0x73)
+	o = append(o, 0x83, 0xa7, 0x50, 0x72, 0x65, 0x73, 0x65, 0x74, 0x73)
 	o = msgp.AppendArrayHeader(o, uint32(len(z.Presets)))
 	for za0001 := range z.Presets {
 		o, err = _RT2(&z.Presets[za0001]).MarshalMsg(o)
@@ -280,6 +296,9 @@ func (z *PresetList[T, _RT2]) MarshalMsg(b []byte) (o []byte, err error) {
 			return
 		}
 	}
+	// string "ListName"
+	o = append(o, 0xa8, 0x4c, 0x69, 0x73, 0x74, 0x4e, 0x61, 0x6d, 0x65)
+	o = msgp.AppendString(o, z.ListName)
 	return
 }
 
@@ -348,6 +367,12 @@ func (z *PresetList[T, _RT2]) UnmarshalMsg(bts []byte) (o []byte, err error) {
 				}
 				z.ByName[za0002] = za0003
 			}
+		case "ListName":
+			z.ListName, bts, err = msgp.ReadStringBytes(bts)
+			if err != nil {
+				err = msgp.WrapError(err, "ListName")
+				return
+			}
 		default:
 			bts, err = msgp.Skip(bts)
 			if err != nil {
@@ -373,5 +398,6 @@ func (z *PresetList[T, _RT2]) Msgsize() (s int) {
 			s += msgp.StringPrefixSize + len(za0002) + _RT2(&za0003).Msgsize()
 		}
 	}
+	s += 9 + msgp.StringPrefixSize + len(z.ListName)
 	return
 }
