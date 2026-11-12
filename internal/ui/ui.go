@@ -205,11 +205,9 @@ func GetAq10CustomToneByUI() (*custom.Aq10CustomTone, error) {
 	if err != nil {
 		return nil, err
 	}
-	// LMD
+	// Set lmd and fsc
 	customLmd := 0
 	customFsc := 50
-	customPitch := 20
-	customAccent := 0
 	err = GetMultipleParams(
 		NewDataNeededDefinitionWithCF(
 			"LMD",
@@ -225,32 +223,50 @@ func GetAq10CustomToneByUI() (*custom.Aq10CustomTone, error) {
 			200,
 			&customFsc,
 		),
-		NewDataNeededDefinitionWithCF(
-			"Pitch",
-			"pitch of the tone",
-			20,
-			200,
-			&customPitch,
-		),
-		NewDataNeededDefinitionWithCF(
-			"Accent",
-			"the strength of the tone",
-			0,
-			200,
-			&customAccent,
-		),
 	)
 	newCustomTone := custom.NewAq10CustomTone().WithBase(
 		selectedBase,
 	).WithLMD(
 		int32(customLmd),
-	).WithAccent(
-		int32(customAccent),
 	).WithFSC(
 		int32(customFsc),
-	).WithPitch(
-		int32(customPitch),
 	)
+	// Adjust accent or pitch
+	adjustAccentOrPitch, err := GetAnswerForYesNoQuestion(
+		"Do you want to adjust accent and pitch value which depends on the base setted?",
+		false,
+	)
+	if err != nil {
+		return newCustomTone, err
+	}
+	if adjustAccentOrPitch {
+		customPitch := 20
+		customAccent := 0
+		err = GetMultipleParams(
+			NewDataNeededDefinitionWithCF(
+				"Pitch",
+				"pitch of the tone",
+				20,
+				200,
+				&customPitch,
+			),
+			NewDataNeededDefinitionWithCF(
+				"Accent",
+				"the strength of the tone",
+				0,
+				200,
+				&customAccent,
+			),
+		)
+		if err != nil {
+			return newCustomTone, err
+		}
+		newCustomTone.WithPitch(
+			int32(customPitch),
+		).WithAccent(
+			int32(customAccent),
+		)
+	}
 	return newCustomTone, nil
 }
 

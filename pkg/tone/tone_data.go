@@ -82,6 +82,7 @@ func (tone *Data) SetAq10Preset(
 func (tone *Data) SetAq10CustomTone(
 	customTone *custom.Aq10CustomTone,
 ) *Data {
+	tone.Aq10Preset = &aqdata.Aq10Custom
 	tone.Aq10CustomTone = customTone
 	return tone
 }

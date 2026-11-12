@@ -68,3 +68,8 @@ func (base Aq10Base) ToString() string {
 		return "NotSupported"
 	}
 }
+
+// ToInt converts base to int32
+func (base Aq10Base) ToInt() int32 {
+	return int32(base)
+}

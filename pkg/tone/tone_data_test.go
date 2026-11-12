@@ -266,3 +266,24 @@ func TestDataReadLoad(t *testing.T) {
 		}
 	}
 }
+
+// TestGetPresetID tests fetching of preset id
+func TestGetPresetID(t *testing.T) {
+	t.Parallel()
+	newData := NewData().SetAq10Preset(
+		aqdata.Aq10F1,
+	)
+	id, err := newData.GetPresetID(
+		aqdata.AqVer10,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if id != 1 {
+		t.Fatalf(
+			"expected id to be %d, got %d",
+			1,
+			id,
+		)
+	}
+}

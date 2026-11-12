@@ -19,7 +19,7 @@ func (p Preset) ToString() string {
 	return p.Name
 }
 
-// GetIndex gets the index for preset
+// GetIndex gets the index for preset, the second return value returns false if it does not exists
 func (p Preset) GetIndex() (int32, bool) {
 	if p.Name == "" {
 		return 0, false
