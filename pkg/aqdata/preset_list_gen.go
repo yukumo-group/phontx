@@ -25,7 +25,7 @@ func (z *Preset) DecodeMsg(dc *msgp.Reader) (err error) {
 		}
 		switch msgp.UnsafeString(field) {
 		case "Index":
-			z.Index, err = dc.ReadInt32()
+			z.Index, err = dc.ReadUint32()
 			if err != nil {
 				err = msgp.WrapError(err, "Index")
 				return
@@ -55,7 +55,7 @@ func (z Preset) EncodeMsg(en *msgp.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	err = en.WriteInt32(z.Index)
+	err = en.WriteUint32(z.Index)
 	if err != nil {
 		err = msgp.WrapError(err, "Index")
 		return
@@ -79,7 +79,7 @@ func (z Preset) MarshalMsg(b []byte) (o []byte, err error) {
 	// map header, size 2
 	// string "Index"
 	o = append(o, 0x82, 0xa5, 0x49, 0x6e, 0x64, 0x65, 0x78)
-	o = msgp.AppendInt32(o, z.Index)
+	o = msgp.AppendUint32(o, z.Index)
 	// string "Name"
 	o = append(o, 0xa4, 0x4e, 0x61, 0x6d, 0x65)
 	o = msgp.AppendString(o, z.Name)
@@ -105,7 +105,7 @@ func (z *Preset) UnmarshalMsg(bts []byte) (o []byte, err error) {
 		}
 		switch msgp.UnsafeString(field) {
 		case "Index":
-			z.Index, bts, err = msgp.ReadInt32Bytes(bts)
+			z.Index, bts, err = msgp.ReadUint32Bytes(bts)
 			if err != nil {
 				err = msgp.WrapError(err, "Index")
 				return
@@ -130,7 +130,7 @@ func (z *Preset) UnmarshalMsg(bts []byte) (o []byte, err error) {
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z Preset) Msgsize() (s int) {
-	s = 1 + 6 + msgp.Int32Size + 5 + msgp.StringPrefixSize + len(z.Name)
+	s = 1 + 6 + msgp.Uint32Size + 5 + msgp.StringPrefixSize + len(z.Name)
 	return
 }
 

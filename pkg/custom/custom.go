@@ -13,13 +13,13 @@ type Aq10CustomTone struct {
 	// 0-2
 	Base Aq10Base
 	// 0-200, default: 100
-	LMD int32
+	LMD uint32
 	// 50-200, default: 100
-	FSC int32
+	FSC uint32
 	// 20-200
-	Pitch *int32
+	Pitch *uint32
 	// 0-200
-	Accent *int32
+	Accent *uint32
 }
 
 // NewAq10CustomTone creates new aquestalk10 config
@@ -40,7 +40,7 @@ func (cfg *Aq10CustomTone) WithBase(
 
 // WithPitch sets pitch for config
 func (cfg *Aq10CustomTone) WithPitch(
-	data int32,
+	data uint32,
 ) *Aq10CustomTone {
 	realData := min(max(data, 20), 200)
 	cfg.Pitch = &realData
@@ -49,7 +49,7 @@ func (cfg *Aq10CustomTone) WithPitch(
 
 // WithAccent sets pitch for config
 func (cfg *Aq10CustomTone) WithAccent(
-	data int32,
+	data uint32,
 ) *Aq10CustomTone {
 	realData := min(max(data, 0), 200)
 	cfg.Accent = &realData
@@ -58,7 +58,7 @@ func (cfg *Aq10CustomTone) WithAccent(
 
 // WithLMD sets lmd for config
 func (cfg *Aq10CustomTone) WithLMD(
-	data int32,
+	data uint32,
 ) *Aq10CustomTone {
 	realData := min(max(data, 0), 200)
 	cfg.LMD = realData
@@ -67,7 +67,7 @@ func (cfg *Aq10CustomTone) WithLMD(
 
 // WithFSC sets fsc for config
 func (cfg *Aq10CustomTone) WithFSC(
-	data int32,
+	data uint32,
 ) *Aq10CustomTone {
 	realData := min(max(data, 50), 200)
 	cfg.FSC = realData
@@ -100,19 +100,27 @@ func (cfg *Aq10CustomTone) PackData() ([]byte, []byte, error) {
 	}
 	resultBuffer := new(bytes.Buffer)
 	// Pitch
+	pitch := GetPitch(
+		cfg.Base,
+		cfg.Pitch,
+	)
 	err = binary.Write(
 		resultBuffer,
 		binary.LittleEndian,
-		cfg.Pitch,
+		pitch,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 	// Accent
+	accent := GetAccent(
+		cfg.Base,
+		cfg.Accent,
+	)
 	err = binary.Write(
 		resultBuffer,
 		binary.LittleEndian,
-		cfg.Accent,
+		accent,
 	)
 	if err != nil {
 		return nil, nil, err

@@ -58,7 +58,7 @@ func (tone *Data) IsVersionAllowed(
 // GetPresetID gets id for preset
 func (tone *Data) GetPresetID(
 	version aqdata.AquesVersion,
-) (int32, error) {
+) (uint32, error) {
 	versionAllowed, err := tone.IsVersionAllowed(version)
 	if err != nil {
 		return 0, err

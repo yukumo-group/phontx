@@ -31,13 +31,13 @@ func (z *Aq10CustomTone) DecodeMsg(dc *msgp.Reader) (err error) {
 				return
 			}
 		case "LMD":
-			z.LMD, err = dc.ReadInt32()
+			z.LMD, err = dc.ReadUint32()
 			if err != nil {
 				err = msgp.WrapError(err, "LMD")
 				return
 			}
 		case "FSC":
-			z.FSC, err = dc.ReadInt32()
+			z.FSC, err = dc.ReadUint32()
 			if err != nil {
 				err = msgp.WrapError(err, "FSC")
 				return
@@ -52,9 +52,9 @@ func (z *Aq10CustomTone) DecodeMsg(dc *msgp.Reader) (err error) {
 				z.Pitch = nil
 			} else {
 				if z.Pitch == nil {
-					z.Pitch = new(int32)
+					z.Pitch = new(uint32)
 				}
-				*z.Pitch, err = dc.ReadInt32()
+				*z.Pitch, err = dc.ReadUint32()
 				if err != nil {
 					err = msgp.WrapError(err, "Pitch")
 					return
@@ -70,9 +70,9 @@ func (z *Aq10CustomTone) DecodeMsg(dc *msgp.Reader) (err error) {
 				z.Accent = nil
 			} else {
 				if z.Accent == nil {
-					z.Accent = new(int32)
+					z.Accent = new(uint32)
 				}
-				*z.Accent, err = dc.ReadInt32()
+				*z.Accent, err = dc.ReadUint32()
 				if err != nil {
 					err = msgp.WrapError(err, "Accent")
 					return
@@ -107,7 +107,7 @@ func (z *Aq10CustomTone) EncodeMsg(en *msgp.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	err = en.WriteInt32(z.LMD)
+	err = en.WriteUint32(z.LMD)
 	if err != nil {
 		err = msgp.WrapError(err, "LMD")
 		return
@@ -117,7 +117,7 @@ func (z *Aq10CustomTone) EncodeMsg(en *msgp.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	err = en.WriteInt32(z.FSC)
+	err = en.WriteUint32(z.FSC)
 	if err != nil {
 		err = msgp.WrapError(err, "FSC")
 		return
@@ -133,7 +133,7 @@ func (z *Aq10CustomTone) EncodeMsg(en *msgp.Writer) (err error) {
 			return
 		}
 	} else {
-		err = en.WriteInt32(*z.Pitch)
+		err = en.WriteUint32(*z.Pitch)
 		if err != nil {
 			err = msgp.WrapError(err, "Pitch")
 			return
@@ -150,7 +150,7 @@ func (z *Aq10CustomTone) EncodeMsg(en *msgp.Writer) (err error) {
 			return
 		}
 	} else {
-		err = en.WriteInt32(*z.Accent)
+		err = en.WriteUint32(*z.Accent)
 		if err != nil {
 			err = msgp.WrapError(err, "Accent")
 			return
@@ -172,23 +172,23 @@ func (z *Aq10CustomTone) MarshalMsg(b []byte) (o []byte, err error) {
 	}
 	// string "LMD"
 	o = append(o, 0xa3, 0x4c, 0x4d, 0x44)
-	o = msgp.AppendInt32(o, z.LMD)
+	o = msgp.AppendUint32(o, z.LMD)
 	// string "FSC"
 	o = append(o, 0xa3, 0x46, 0x53, 0x43)
-	o = msgp.AppendInt32(o, z.FSC)
+	o = msgp.AppendUint32(o, z.FSC)
 	// string "Pitch"
 	o = append(o, 0xa5, 0x50, 0x69, 0x74, 0x63, 0x68)
 	if z.Pitch == nil {
 		o = msgp.AppendNil(o)
 	} else {
-		o = msgp.AppendInt32(o, *z.Pitch)
+		o = msgp.AppendUint32(o, *z.Pitch)
 	}
 	// string "Accent"
 	o = append(o, 0xa6, 0x41, 0x63, 0x63, 0x65, 0x6e, 0x74)
 	if z.Accent == nil {
 		o = msgp.AppendNil(o)
 	} else {
-		o = msgp.AppendInt32(o, *z.Accent)
+		o = msgp.AppendUint32(o, *z.Accent)
 	}
 	return
 }
@@ -218,13 +218,13 @@ func (z *Aq10CustomTone) UnmarshalMsg(bts []byte) (o []byte, err error) {
 				return
 			}
 		case "LMD":
-			z.LMD, bts, err = msgp.ReadInt32Bytes(bts)
+			z.LMD, bts, err = msgp.ReadUint32Bytes(bts)
 			if err != nil {
 				err = msgp.WrapError(err, "LMD")
 				return
 			}
 		case "FSC":
-			z.FSC, bts, err = msgp.ReadInt32Bytes(bts)
+			z.FSC, bts, err = msgp.ReadUint32Bytes(bts)
 			if err != nil {
 				err = msgp.WrapError(err, "FSC")
 				return
@@ -238,9 +238,9 @@ func (z *Aq10CustomTone) UnmarshalMsg(bts []byte) (o []byte, err error) {
 				z.Pitch = nil
 			} else {
 				if z.Pitch == nil {
-					z.Pitch = new(int32)
+					z.Pitch = new(uint32)
 				}
-				*z.Pitch, bts, err = msgp.ReadInt32Bytes(bts)
+				*z.Pitch, bts, err = msgp.ReadUint32Bytes(bts)
 				if err != nil {
 					err = msgp.WrapError(err, "Pitch")
 					return
@@ -255,9 +255,9 @@ func (z *Aq10CustomTone) UnmarshalMsg(bts []byte) (o []byte, err error) {
 				z.Accent = nil
 			} else {
 				if z.Accent == nil {
-					z.Accent = new(int32)
+					z.Accent = new(uint32)
 				}
-				*z.Accent, bts, err = msgp.ReadInt32Bytes(bts)
+				*z.Accent, bts, err = msgp.ReadUint32Bytes(bts)
 				if err != nil {
 					err = msgp.WrapError(err, "Accent")
 					return
@@ -277,17 +277,17 @@ func (z *Aq10CustomTone) UnmarshalMsg(bts []byte) (o []byte, err error) {
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z *Aq10CustomTone) Msgsize() (s int) {
-	s = 1 + 5 + z.Base.Msgsize() + 4 + msgp.Int32Size + 4 + msgp.Int32Size + 6
+	s = 1 + 5 + z.Base.Msgsize() + 4 + msgp.Uint32Size + 4 + msgp.Uint32Size + 6
 	if z.Pitch == nil {
 		s += msgp.NilSize
 	} else {
-		s += msgp.Int32Size
+		s += msgp.Uint32Size
 	}
 	s += 7
 	if z.Accent == nil {
 		s += msgp.NilSize
 	} else {
-		s += msgp.Int32Size
+		s += msgp.Uint32Size
 	}
 	return
 }

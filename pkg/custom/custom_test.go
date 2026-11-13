@@ -32,7 +32,7 @@ func TestAq10CustomToneSetting(t *testing.T) {
 	cfg2 := NewAq10CustomTone().WithBase(
 		F1E,
 	).WithFSC(
-		-1,
+		1,
 	).WithLMD(
 		114514,
 	)

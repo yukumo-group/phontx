@@ -12,6 +12,8 @@ import (
 
 // Data defines data to store in .phontx data.
 // It defines tone for multiple tones.
+//
+//go:generate msgp
 type Data struct {
 	// Aquestalk1
 	Aq1Preset *aqdata.Aq1Preset

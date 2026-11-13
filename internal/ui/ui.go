@@ -193,7 +193,7 @@ func GetAq10CustomToneByUI() (*custom.Aq10CustomTone, error) {
 			base.ToString(),
 		)
 	}
-	baseIdx, err := FetchVal[int32](
+	baseIdx, err := FetchVal[uint32](
 		"input the index for the base of the custome tone: ",
 	)
 	if err != nil {
@@ -227,9 +227,9 @@ func GetAq10CustomToneByUI() (*custom.Aq10CustomTone, error) {
 	newCustomTone := custom.NewAq10CustomTone().WithBase(
 		selectedBase,
 	).WithLMD(
-		int32(customLmd),
+		uint32(customLmd),
 	).WithFSC(
-		int32(customFsc),
+		uint32(customFsc),
 	)
 	// Adjust accent or pitch
 	adjustAccentOrPitch, err := GetAnswerForYesNoQuestion(
@@ -262,9 +262,9 @@ func GetAq10CustomToneByUI() (*custom.Aq10CustomTone, error) {
 			return newCustomTone, err
 		}
 		newCustomTone.WithPitch(
-			int32(customPitch),
+			uint32(customPitch),
 		).WithAccent(
-			int32(customAccent),
+			uint32(customAccent),
 		)
 	}
 	return newCustomTone, nil

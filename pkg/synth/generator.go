@@ -5,13 +5,15 @@ import (
 
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
+	"github.com/yukumo-group/wazero-gwmm/pkg/storage"
 )
 
 // Generator defines a single generator.
 // YOU MUST CLOSE GENERATOR AFTER USE!!!!
 type Generator struct {
-	mod    api.Module
-	memory api.Memory
+	mod         api.Module
+	memory      api.Memory
+	dataManager *storage.StoredDataManager
 }
 
 // NewGenerator creates new generator
@@ -28,15 +30,9 @@ func NewGenerator(
 		return nil, err
 	}
 	return &Generator{
-		mod: generatorModule,
+		mod:         generatorModule,
+		dataManager: storage.NewStoredDataManager(),
 	}, nil
-}
-
-// AllocateMemory allocates memory
-func (generator *Generator) AllocateMemory(
-	startPos int,
-) error {
-	return nil
 }
 
 // CloseGenerator closes generator in memory

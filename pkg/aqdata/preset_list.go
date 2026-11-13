@@ -10,7 +10,7 @@ import (
 //
 //go:generate msgp
 type Preset struct {
-	Index int32
+	Index uint32
 	Name  string
 }
 
@@ -20,7 +20,7 @@ func (p Preset) ToString() string {
 }
 
 // GetIndex gets the index for preset, the second return value returns false if it does not exists
-func (p Preset) GetIndex() (int32, bool) {
+func (p Preset) GetIndex() (uint32, bool) {
 	if p.Name == "" {
 		return 0, false
 	}
@@ -31,7 +31,7 @@ func (p Preset) GetIndex() (int32, bool) {
 type PresetLike interface {
 	~struct{ Preset }
 	ToString() string
-	GetIndex() (int32, bool)
+	GetIndex() (uint32, bool)
 }
 
 // IsPresetsEqual checks if two presets are the same
@@ -88,7 +88,7 @@ func (l *PresetList[T, _]) define(name string) T {
 		panic("duplicate preset " + name)
 	}
 	// create a new preset based on the preset type
-	p := T{Preset{int32(len(l.Presets)), name}}
+	p := T{Preset{uint32(len(l.Presets)), name}}
 	l.Presets = append(l.Presets, p)
 	l.ByName[name] = p
 	return p

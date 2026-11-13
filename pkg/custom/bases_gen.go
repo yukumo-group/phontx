@@ -9,8 +9,8 @@ import (
 // DecodeMsg implements msgp.Decodable
 func (z *Aq10Base) DecodeMsg(dc *msgp.Reader) (err error) {
 	{
-		var zb0001 int32
-		zb0001, err = dc.ReadInt32()
+		var zb0001 uint32
+		zb0001, err = dc.ReadUint32()
 		if err != nil {
 			err = msgp.WrapError(err)
 			return
@@ -22,7 +22,7 @@ func (z *Aq10Base) DecodeMsg(dc *msgp.Reader) (err error) {
 
 // EncodeMsg implements msgp.Encodable
 func (z Aq10Base) EncodeMsg(en *msgp.Writer) (err error) {
-	err = en.WriteInt32(int32(z))
+	err = en.WriteUint32(uint32(z))
 	if err != nil {
 		err = msgp.WrapError(err)
 		return
@@ -33,15 +33,15 @@ func (z Aq10Base) EncodeMsg(en *msgp.Writer) (err error) {
 // MarshalMsg implements msgp.Marshaler
 func (z Aq10Base) MarshalMsg(b []byte) (o []byte, err error) {
 	o = msgp.Require(b, z.Msgsize())
-	o = msgp.AppendInt32(o, int32(z))
+	o = msgp.AppendUint32(o, uint32(z))
 	return
 }
 
 // UnmarshalMsg implements msgp.Unmarshaler
 func (z *Aq10Base) UnmarshalMsg(bts []byte) (o []byte, err error) {
 	{
-		var zb0001 int32
-		zb0001, bts, err = msgp.ReadInt32Bytes(bts)
+		var zb0001 uint32
+		zb0001, bts, err = msgp.ReadUint32Bytes(bts)
 		if err != nil {
 			err = msgp.WrapError(err)
 			return
@@ -54,6 +54,6 @@ func (z *Aq10Base) UnmarshalMsg(bts []byte) (o []byte, err error) {
 
 // Msgsize returns an upper bound estimate of the number of bytes occupied by the serialized message
 func (z Aq10Base) Msgsize() (s int) {
-	s = msgp.Int32Size
+	s = msgp.Uint32Size
 	return
 }

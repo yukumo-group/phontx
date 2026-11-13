@@ -1,3 +1,4 @@
+//go:generate msgp
 package aqdata
 
 // Aq1Preset defines the preset for aquestak1

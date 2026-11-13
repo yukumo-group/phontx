@@ -4,7 +4,7 @@ import "fmt"
 
 // Aq10Base defines bases for aquestalk10
 //go:generate msgp
-type Aq10Base int32
+type Aq10Base uint32
 
 const (
 	// F1E defines the F1E bases
@@ -17,7 +17,7 @@ const (
 
 // VerifyBase verifies whether this data is a valid base
 func VerifyBase(
-	data int32,
+	data uint32,
 ) bool {
 	return data >= 0 && data <= 2
 }
@@ -25,7 +25,7 @@ func VerifyBase(
 // ToAq10Base converts int to Aq10Bases.
 // Range: 0-2.
 func ToAq10Base(
-	data int32,
+	data uint32,
 ) (Aq10Base, error) {
 	if !VerifyBase(data) {
 		return F1E, fmt.Errorf(
@@ -45,7 +45,7 @@ func GetAllAq10Bases(
 	realNum := min(max(numBasesFetched, 0), 3)
 	for i := range realNum {
 		tmpBase, err := ToAq10Base(
-			int32(i),
+			uint32(i),
 		)
 		if err != nil {
 			return result, err
@@ -69,7 +69,7 @@ func (base Aq10Base) ToString() string {
 	}
 }
 
-// ToInt converts base to int32
-func (base Aq10Base) ToInt() int32 {
-	return int32(base)
+// ToInt converts base to uint32
+func (base Aq10Base) ToInt() uint32 {
+	return uint32(base)
 }
