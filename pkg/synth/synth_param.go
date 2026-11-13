@@ -1,7 +1,7 @@
 package synth
 
-// SynthParam defines the parameter for synthesis
-type SynthParam struct {
+// Param defines the parameter for synthesis
+type Param struct {
 	Speed      uint32
 	Text       string
 	textLength uint32
@@ -13,9 +13,9 @@ func NewSynthParam(
 	text string,
 	speed uint32,
 	volume uint32,
-) *SynthParam {
+) *Param {
 	textLength := uint32(len([]byte(text)))
-	return &SynthParam{
+	return &Param{
 		Speed:      speed,
 		Text:       text,
 		textLength: textLength,

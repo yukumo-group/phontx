@@ -15,7 +15,7 @@ func PackData(
 	phontData uint32,
 	version aqdata.AquesVersion,
 	tone *tone.Data,
-	synthParam *SynthParam,
+	synthParam *Param,
 ) ([]byte, error) {
 	if tone == nil || synthParam == nil {
 		return nil, errors.New(

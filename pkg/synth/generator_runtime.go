@@ -23,7 +23,7 @@ func NewGeneratorRuntime(
 	}
 }
 
-// CreateRuntime creates runtime
+// InitializeRuntime creates runtime
 func (generator *GeneratorRuntime) InitializeRuntime(
 	ctx context.Context,
 ) error {

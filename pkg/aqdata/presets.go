@@ -1,3 +1,5 @@
+// Package aqdata stores the predefined datas for generation
+//
 //go:generate msgp
 package aqdata
 
