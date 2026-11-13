@@ -7,6 +7,7 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/tetratelabs/wazero v1.12.0
 	github.com/tinylib/msgp v1.6.5
+	github.com/wille/osutil v1.0.0
 	github.com/yukumo-group/wazero-gwmm v0.0.0-20261112130845-70075d8f2844
 )
 

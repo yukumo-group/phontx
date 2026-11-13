@@ -3,6 +3,8 @@ package python
 import (
 	"os"
 	"os/exec"
+
+	"github.com/wille/osutil"
 )
 
 // ExecutePython executes python
@@ -21,5 +23,12 @@ func ExecutePython(
 		string(scriptData),
 	)
 	content, err := cmd.CombinedOutput()
-	return content[:len(content)-2], err
+	if err != nil {
+		return nil, err
+	}
+	osName := osutil.Name
+	if osName == "Windows" {
+		return content[:len(content)-2], nil
+	}
+	return content, nil
 }
