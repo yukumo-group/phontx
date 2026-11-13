@@ -27,8 +27,12 @@ func ExecutePython(
 		return nil, err
 	}
 	osName := osutil.Name
-	if osName == "Windows" {
+	switch osName {
+	case "Windows":
 		return content[:len(content)-2], nil
+	case "Linux":
+		return content[:len(content)-1], nil
+	default:
+		return content, nil
 	}
-	return content, nil
 }
