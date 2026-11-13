@@ -15,7 +15,6 @@ jobs:
       with:
         go-version-file: go.mod
     
-    - uses: actions/checkout@v6
     - name: Set up Python 3.13
       uses: actions/setup-python@v5
       with:
