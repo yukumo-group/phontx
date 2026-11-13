@@ -14,6 +14,12 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version-file: go.mod
+    
+    - uses: actions/checkout@v6
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.13
 
     - name: Download dependencies
       run: go mod download
