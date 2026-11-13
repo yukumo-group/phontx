@@ -19,7 +19,7 @@ const (
 func VerifyBase(
 	data uint32,
 ) bool {
-	return data >= 0 && data <= 2
+	return data <= 2
 }
 
 // ToAq10Base converts int to Aq10Bases.

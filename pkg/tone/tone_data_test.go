@@ -38,7 +38,10 @@ func TestToneDataSetting(t *testing.T) {
 		)
 	}
 	aq1Preset := testData.Aq1Preset
-	if *aq1Preset != aqdata.Aq1F1 {
+	if !aqdata.IsPresetsEqual(
+		aq1Preset,
+		&aqdata.Aq1F1,
+	) {
 		t.Errorf(
 			"expected Aq1Preset to be %s, got %s",
 			aqdata.Aq1F1.ToString(),
@@ -52,9 +55,12 @@ func TestToneDataSetting(t *testing.T) {
 		)
 	}
 	aq2Preset := testData.Aq2Preset
-	if *aq2Preset != aqdata.Aq2AqTeto1 {
+	if !aqdata.IsPresetsEqual(
+		aq2Preset,
+		&aqdata.Aq2AqTeto1,
+	) {
 		t.Errorf(
-			"expected Aq1Preset to be %s, got %s",
+			"expected Aq2Preset to be %s, got %s",
 			aqdata.Aq2AqTeto1.ToString(),
 			(*aq2Preset).ToString(),
 		)
@@ -66,10 +72,13 @@ func TestToneDataSetting(t *testing.T) {
 		)
 	}
 	aq10Preset := testData.Aq10Preset
-	if *aq10Preset != aqdata.Aq10F1 {
+	if !aqdata.IsPresetsEqual(
+		aq10Preset,
+		&aqdata.Aq10Custom,
+	) {
 		t.Errorf(
-			"expected Aq1Preset to be %s, got %s",
-			aqdata.Aq10F1.ToString(),
+			"expected Aq10Preset to be %s, got %s",
+			aqdata.Aq10Custom.ToString(),
 			(*aq10Preset).ToString(),
 		)
 	}

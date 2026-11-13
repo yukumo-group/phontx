@@ -88,7 +88,12 @@ func (l *PresetList[T, _]) define(name string) T {
 		panic("duplicate preset " + name)
 	}
 	// create a new preset based on the preset type
-	p := T{Preset{uint32(len(l.Presets)), name}}
+	p := T{
+		Preset{
+			Index: uint32(len(l.Presets)),
+			Name:  name,
+		},
+	}
 	l.Presets = append(l.Presets, p)
 	l.ByName[name] = p
 	return p
