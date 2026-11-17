@@ -14,10 +14,10 @@ import (
 func PackData(
 	phontData uint32,
 	version aqdata.AquesVersion,
-	tone *tone.Data,
+	toneData *tone.Data,
 	synthParam *Param,
 ) ([]byte, error) {
-	if tone == nil || synthParam == nil {
+	if toneData == nil || synthParam == nil {
 		return nil, errors.New(
 			"you cannot input nil tone or synth param",
 		)
@@ -33,7 +33,7 @@ func PackData(
 		return nil, err
 	}
 	// preset id
-	presetID, err := tone.GetPresetID(
+	presetID, err := toneData.GetPresetID(
 		version,
 	)
 	if err != nil {
@@ -69,8 +69,8 @@ func PackData(
 	var base []byte
 	var customData []byte
 	var convertTone *custom.Aq10CustomTone
-	if tone.Aq10CustomTone != nil {
-		convertTone = tone.Aq10CustomTone
+	if toneData.Aq10CustomTone != nil {
+		convertTone = toneData.Aq10CustomTone
 	} else {
 		convertTone = custom.NewAq10CustomTone().WithFSC(
 			100,
@@ -105,15 +105,6 @@ func PackData(
 		result,
 		binary.LittleEndian,
 		customData,
-	)
-	if err != nil {
-		return nil, err
-	}
-	// speed
-	err = binary.Write(
-		result,
-		binary.LittleEndian,
-		synthParam.Volume,
 	)
 	if err != nil {
 		return nil, err
