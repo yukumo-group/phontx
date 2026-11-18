@@ -12,7 +12,7 @@ import (
 
 // PackData packs synth param to byte buffer
 func PackData(
-	phontData uint32,
+	phontDataOffset uint32,
 	version aqdata.AquesVersion,
 	toneData *tone.Data,
 	synthParam *Param,
@@ -60,7 +60,7 @@ func PackData(
 	err = binary.Write(
 		result,
 		binary.LittleEndian,
-		phontData,
+		phontDataOffset,
 	)
 	if err != nil {
 		return nil, err

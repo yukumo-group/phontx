@@ -2,8 +2,8 @@ package bts
 
 // NextOffset gets nexxt offset that can be devided by 4
 func NextOffset(
-	offset int32,
-	length int32,
-) int32 {
-	return ((offset + length + 3) / 4) * 4
+	offset uint32,
+	length uint32,
+) uint32 {
+	return ((offset + length + 16 + 3) / 4) * 4
 }

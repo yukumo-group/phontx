@@ -7,6 +7,7 @@ import (
 
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
+	"github.com/yukumo-group/phontx/internal/bts"
 	"github.com/yukumo-group/phontx/pkg/aqdata"
 	"github.com/yukumo-group/phontx/pkg/tone"
 )
@@ -43,6 +44,56 @@ func NewGenerator(
 	}, nil
 }
 
+// GetByteInMemory gets single byte in memory
+func (generator *Generator) GetByteInMemory(
+	ctx context.Context,
+	i uint32,
+) (byte, error) {
+	data, ok := generator.memory.ReadByte(i)
+	if !ok {
+		return byte(0), fmt.Errorf(
+			"failed to get byte in memory position %d",
+			i,
+		)
+	}
+	return data, nil
+}
+
+// GiveError gives error from the function given by wasm module
+func (generator *Generator) GiveError(
+	ctx context.Context,
+	version aqdata.AquesVersion,
+	code uint64,
+) error {
+	if code == 0 {
+		return nil
+	}
+	const errorMessageFunctionName string = "aq_error_message"
+	giveErrorExportedFunction := generator.mod.ExportedFunction(
+		errorMessageFunctionName,
+	)
+	if giveErrorExportedFunction == nil {
+		return fmt.Errorf(
+			"%s is not successfully exported",
+			errorMessageFunctionName,
+		)
+	}
+	datas, err := giveErrorExportedFunction.Call(
+		ctx,
+		uint64(version),
+		code,
+	)
+	if err != nil {
+		return err
+	}
+	if len(datas) < 1 {
+		return errors.New(
+			"returned no data",
+		)
+	}
+	return nil
+}
+
 // Generate generates an audio
 func (generator *Generator) Generate(
 	ctx context.Context,
@@ -50,7 +101,17 @@ func (generator *Generator) Generate(
 	param *Param,
 	toneData *tone.Data,
 ) error {
-	const phontDataName string = "phont_data"
+	const synthFunctionName string = "aq_synthesize"
+	// Exports function
+	exportedSynthFunction := generator.mod.ExportedFunction(
+		synthFunctionName,
+	)
+	if exportedSynthFunction == nil {
+		return fmt.Errorf(
+			"function %s does not exist",
+			synthFunctionName,
+		)
+	}
 	// Checks if version is allowed
 	versionAllowed, err := toneData.IsVersionAllowed(
 		version,
@@ -76,12 +137,73 @@ func (generator *Generator) Generate(
 		phontDataOffset,
 		phontData,
 	)
+	lengthOfPhontData := len(phontData)
 	if !ok {
 		return fmt.Errorf(
 			"data of length %d out of range",
-			len(phontData),
+			lengthOfPhontData,
 		)
 	}
+	// Pack param
+	packedData, err := PackData(
+		phontDataOffset,
+		version,
+		toneData,
+		param,
+	)
+	if err != nil {
+		return err
+	}
+	packedDataOffset := bts.NextOffset(
+		phontDataOffset,
+		uint32(lengthOfPhontData),
+	)
+	ok = generator.memory.Write(
+		packedDataOffset,
+		packedData,
+	)
+	lengthOfPackedData := len(packedData)
+	if !ok {
+		return fmt.Errorf(
+			"data, length of %d, starting from offset %d, is out of range",
+			lengthOfPackedData,
+			packedDataOffset,
+		)
+	}
+	// text
+	textConvertedToBytes := []byte(param.Text)
+	textOffset := bts.NextOffset(
+		packedDataOffset,
+		uint32(lengthOfPackedData),
+	)
+	ok = generator.memory.Write(
+		textOffset,
+		textConvertedToBytes,
+	)
+	lengthOfText := len(textConvertedToBytes)
+	if !ok {
+		return fmt.Errorf(
+			"data, length of %d, starting from offset %d, is out of range",
+			lengthOfText,
+			textOffset,
+		)
+	}
+	// Out data definition
+	outDataOffset := bts.NextOffset(
+		textOffset,
+		uint32(lengthOfText),
+	)
+	outLen := outDataOffset + 4
+	// Call Generation function
+	exportedSynthFunction.Call(
+		ctx,
+		uint64(textOffset),
+		uint64(lengthOfText),
+		uint64(packedDataOffset),
+		uint64(lengthOfPhontData),
+		uint64(outDataOffset),
+		uint64(outLen),
+	)
 	return nil
 }
 
