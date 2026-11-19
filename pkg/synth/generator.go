@@ -1,9 +1,12 @@
 package synth
 
 import (
+	"bytes"
 	"context"
+	"encoding/binary"
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
@@ -59,6 +62,47 @@ func (generator *Generator) GetByteInMemory(
 	return data, nil
 }
 
+// GetWavData gets wav data
+func (generator *Generator) GetWavData(
+	outPos uint32,
+	outLen uint32,
+	fileName string,
+) ([]byte, error) {
+	outData, ok := generator.memory.Read(
+		outPos,
+		outLen+4,
+	)
+	if !ok {
+		return nil, fmt.Errorf(
+			"failed to read data from %d with len %d",
+			outPos,
+			outLen+4,
+		)
+	}
+	newBuffer := bytes.NewBuffer(outData)
+	nextData := newBuffer.Next(8)
+	outDataStartPosInBytes := nextData[:4]
+	outDataLengthInBytes := nextData[4:9]
+	outDataStartPos := binary.LittleEndian.Uint32(
+		outDataStartPosInBytes,
+	)
+	outDataLength := binary.LittleEndian.Uint32(
+		outDataLengthInBytes,
+	)
+	wavData, ok := generator.memory.Read(
+		outDataStartPos,
+		outDataLength,
+	)
+	if !ok {
+		return nil, fmt.Errorf(
+			"failed to read data from %d with len %d",
+			outDataStartPos,
+			outDataLength,
+		)
+	}
+	return wavData, nil
+}
+
 // GiveError gives error from the function given by wasm module
 func (generator *Generator) GiveError(
 	ctx context.Context,
@@ -91,7 +135,17 @@ func (generator *Generator) GiveError(
 			"returned no data",
 		)
 	}
-	return nil
+	stringData, err := bts.ToString(
+		ctx,
+		uint32(datas[0]),
+		generator.GetByteInMemory,
+	)
+	if err != nil {
+		return err
+	}
+	return errors.New(
+		stringData,
+	)
 }
 
 // Generate generates an audio
@@ -195,7 +249,7 @@ func (generator *Generator) Generate(
 	)
 	outLen := outDataOffset + 4
 	// Call Generation function
-	exportedSynthFunction.Call(
+	returnedData, err := exportedSynthFunction.Call(
 		ctx,
 		uint64(textOffset),
 		uint64(lengthOfText),
@@ -204,7 +258,37 @@ func (generator *Generator) Generate(
 		uint64(outDataOffset),
 		uint64(outLen),
 	)
-	return nil
+	if err != nil {
+		return err
+	}
+	if len(returnedData) < 1 {
+		return errors.New(
+			"no data returned",
+		)
+	}
+	err = generator.GiveError(
+		ctx,
+		version,
+		returnedData[0],
+	)
+	if err != nil {
+		return err
+	}
+	// get wav data and save
+	wavData, err := generator.GetWavData(
+		outDataOffset,
+		outLen,
+		param.FilePath,
+	)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(
+		param.FilePath,
+		wavData,
+		0644,
+	)
+	return err
 }
 
 // CloseGenerator closes generator in memory

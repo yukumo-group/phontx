@@ -6,6 +6,7 @@ type Param struct {
 	Text       string
 	textLength uint32
 	Volume     uint32
+	FilePath   string
 }
 
 // NewSynthParam creates new param for synthesis audio
@@ -13,6 +14,7 @@ func NewSynthParam(
 	text string,
 	speed uint32,
 	volume uint32,
+	filePath string,
 ) *Param {
 	textLength := uint32(len([]byte(text)))
 	return &Param{
@@ -20,5 +22,6 @@ func NewSynthParam(
 		Text:       text,
 		textLength: textLength,
 		Volume:     volume,
+		FilePath:   filePath,
 	}
 }

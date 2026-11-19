@@ -33,6 +33,7 @@ func TestToParam(t *testing.T) {
 		"114514",
 		60,
 		100,
+		"114514.wav",
 	)
 	customTone := custom.NewAq10CustomTone().WithAccent(
 		30,
