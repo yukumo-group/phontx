@@ -3,6 +3,10 @@ version: 2
 gomod:
   proxy: true
 
+builds:
+  - main: ./cmd
+    binary: phontx
+
 release:
   github:
     owner: yukumo-group

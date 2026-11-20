@@ -9,6 +9,21 @@ import (
 // PhontxFilePath defines the file path of phontx file
 var PhontxFilePath string
 
+// TargetText defines the target text for generation
+var TargetText string
+
+// TargetVolume defines the volume of target audio generated
+var TargetVolume int32 = -1
+
+// TargetSpeed defines the volume of target speed generated
+var TargetSpeed int32 = -1
+
+// TargetAudioFileName defines the name for audio file
+var TargetAudioFileName string
+
+// TargetAudioDirectory defines the directory that stores audio file
+var TargetAudioDirectory string
+
 // rootCommand defines the root command
 var rootCommand = &cobra.Command{
 	Use:   "phontx",
@@ -31,6 +46,7 @@ You can:
 
 // init adds subcommands
 func init() {
+	// Set arguments for readPhontx
 	readPhontxCommand.PersistentFlags().StringVarP(
 		&PhontxFilePath,
 		"filePath",
@@ -38,12 +54,61 @@ func init() {
 		"",
 		"path to phontx file",
 	)
+	readPhontxCommand.MarkFlagRequired("filePath")
+	// Set arguments for synth audio
+	synthAudioCommand.PersistentFlags().StringVarP(
+		&PhontxFilePath,
+		"filePath",
+		"f",
+		"",
+		"path to phontx file",
+	)
+	synthAudioCommand.MarkFlagRequired("filePath")
+	synthAudioCommand.PersistentFlags().StringVarP(
+		&TargetText,
+		"targetText",
+		"t",
+		"",
+		"text to generate",
+	)
+	synthAudioCommand.MarkFlagRequired("targetText")
+	synthAudioCommand.PersistentFlags().StringVarP(
+		&TargetAudioFileName,
+		"targetAudioFileName",
+		"a",
+		"",
+		"the target name of the audio file (no .wav suffix needed)",
+	)
+	synthAudioCommand.MarkFlagRequired("targetAudioFileName")
+	synthAudioCommand.PersistentFlags().StringVarP(
+		&TargetAudioDirectory,
+		"targetAudioDirectory",
+		"d",
+		"",
+		"the target directory to store the audio",
+	)
+	synthAudioCommand.PersistentFlags().Int32VarP(
+		&TargetVolume,
+		"targetVolume",
+		"v",
+		-1,
+		"text to generate",
+	)
+	synthAudioCommand.PersistentFlags().Int32VarP(
+		&TargetSpeed,
+		"targetSpeed",
+		"s",
+		-1,
+		"volume of the generated audio",
+	)
+	// Add subcommands for a command
 	readPhontxCommand.AddCommand(
 		showEngineInfo,
 	)
 	rootCommand.AddCommand(
 		createPhontxCommand,
 		readPhontxCommand,
+		synthAudioCommand,
 	)
 }
 

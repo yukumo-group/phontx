@@ -326,3 +326,28 @@ func ShowEngineInfo(
 		allowedEngine.Aq10,
 	)
 }
+
+// SelectVersion selects version through ui
+func SelectVersion(
+	prompt string,
+) (aqdata.AquesVersion, error) {
+	fmt.Println(prompt)
+	aqVersions := aqdata.GetAllVersions()
+	fmt.Println("Here are the available versions: ")
+	for _, version := range aqVersions {
+		fmt.Printf(
+			"index of version %d: %d\n",
+			version,
+			version.ToInt(),
+		)
+	}
+	fmt.Println("Input the index of the version you want to use: ")
+	var usedVersion uint32
+	_, err := fmt.Scan(&usedVersion)
+	if err != nil {
+		return aqdata.AqVer2, err
+	}
+	return aqdata.ToAquesVersion(
+		usedVersion,
+	), nil
+}

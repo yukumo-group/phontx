@@ -18,10 +18,10 @@ func NewSynthParam(
 ) *Param {
 	textLength := uint32(len([]byte(text)))
 	return &Param{
-		Speed:      speed,
+		Speed:      min(max(speed, 50), 300),
 		Text:       text,
 		textLength: textLength,
-		Volume:     volume,
+		Volume:     min(max(volume, 0), 300),
 		FilePath:   filePath,
 	}
 }
