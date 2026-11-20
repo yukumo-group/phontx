@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
@@ -18,6 +19,7 @@ import (
 // Generator defines a single generator.
 // YOU MUST CLOSE GENERATOR AFTER USE!!!!
 type Generator struct {
+	lock   sync.RWMutex
 	mod    api.Module
 	memory api.Memory
 }
@@ -62,18 +64,40 @@ func (generator *Generator) GetByteInMemory(
 	return data, nil
 }
 
+// FreeWavData frees .wav data
+func (generator *Generator) FreeWavData(
+	ctx context.Context,
+	wavOffset uint64,
+) error {
+	const freeWavFunctionName string = "aq_free"
+	freeWavFunction := generator.mod.ExportedFunction(
+		freeWavFunctionName,
+	)
+	if freeWavFunction == nil {
+		return fmt.Errorf(
+			"failed to get function %s",
+			freeWavFunctionName,
+		)
+	}
+	_, err := freeWavFunction.Call(
+		ctx,
+		wavOffset,
+	)
+	return err
+}
+
 // GetWavData gets wav data
 func (generator *Generator) GetWavData(
 	outPos uint32,
 	outLen uint32,
 	fileName string,
-) ([]byte, error) {
+) (uint32, []byte, error) {
 	outData, ok := generator.memory.Read(
 		outPos,
 		outLen+4,
 	)
 	if !ok {
-		return nil, fmt.Errorf(
+		return 0, nil, fmt.Errorf(
 			"failed to read data from %d with len %d",
 			outPos,
 			outLen+4,
@@ -94,13 +118,13 @@ func (generator *Generator) GetWavData(
 		outDataLength,
 	)
 	if !ok {
-		return nil, fmt.Errorf(
+		return outDataStartPos, nil, fmt.Errorf(
 			"failed to read data from %d with len %d",
 			outDataStartPos,
 			outDataLength,
 		)
 	}
-	return wavData, nil
+	return outDataStartPos, wavData, nil
 }
 
 // GiveError gives error from the function given by wasm module
@@ -155,6 +179,8 @@ func (generator *Generator) Generate(
 	param *Param,
 	toneData *tone.Data,
 ) error {
+	generator.lock.Lock()
+	defer generator.lock.Unlock()
 	const synthFunctionName string = "aq_synthesize"
 	// Exports function
 	exportedSynthFunction := generator.mod.ExportedFunction(
@@ -275,10 +301,17 @@ func (generator *Generator) Generate(
 		return err
 	}
 	// get wav data and save
-	wavData, err := generator.GetWavData(
+	outOffset, wavData, err := generator.GetWavData(
 		outDataOffset,
 		outLen,
 		param.FilePath,
+	)
+	if err != nil {
+		return err
+	}
+	err = generator.FreeWavData(
+		ctx,
+		uint64(outOffset),
 	)
 	if err != nil {
 		return err

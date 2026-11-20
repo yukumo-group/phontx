@@ -8,7 +8,8 @@ type RawPreset struct {
 
 // RawTone defines the raw tone from yaml to phontx
 type RawTone struct {
-	Aq1Preset  *RawPreset
-	Aq2Preset  *RawPreset
-	Aq10Preset *RawPreset
+	Aq1Preset           *RawPreset
+	Aq2Preset           *RawPreset
+	Aq10Preset          *RawPreset
+	SourcePhontFilePath *string
 }
