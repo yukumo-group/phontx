@@ -13,10 +13,10 @@ var PhontxFilePath string
 var TargetText string
 
 // TargetVolume defines the volume of target audio generated
-var TargetVolume int32 = -1
+var TargetVolume int32 = 100
 
 // TargetSpeed defines the volume of target speed generated
-var TargetSpeed int32 = -1
+var TargetSpeed int32 = 100
 
 // TargetAudioFileName defines the name for audio file
 var TargetAudioFileName string

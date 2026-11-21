@@ -8,6 +8,7 @@ require (
 	github.com/tetratelabs/wazero v1.12.0
 	github.com/tinylib/msgp v1.6.5
 	github.com/wille/osutil v1.0.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (

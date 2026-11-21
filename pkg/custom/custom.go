@@ -11,15 +11,15 @@ import (
 //go:generate msgp
 type Aq10CustomTone struct {
 	// 0-2
-	Base Aq10Base
+	Base Aq10Base `yaml:"base"`
 	// 0-200, default: 100
-	LMD uint32
+	LMD uint32 `yaml:"lmd"`
 	// 50-200, default: 100
-	FSC uint32
+	FSC uint32 `yaml:"fsc"`
 	// 20-200
-	Pitch *uint32
+	Pitch *uint32 `yaml:"pitch"`
 	// 0-200
-	Accent *uint32
+	Accent *uint32 `yaml:"accent"`
 }
 
 // NewAq10CustomTone creates new aquestalk10 config

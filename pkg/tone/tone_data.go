@@ -26,21 +26,30 @@ type Data struct {
 	Aq10CustomTone *custom.Aq10CustomTone
 }
 
+// NewDataFromBinary reads new data from binary
+func NewDataFromBinary(
+	bytesData []byte,
+) (*Data, error) {
+	data := NewData()
+	_, err := data.UnmarshalMsg(bytesData)
+	return data, err
+}
+
 // NewDataFromFile reads new data from file
 func NewDataFromFile(
 	filePath string,
 ) (*Data, error) {
-	data := NewData()
 	_, err := os.Stat(filePath)
 	if err != nil {
 		return nil, err
 	}
 	bytesData, err := os.ReadFile(filePath)
 	if err != nil {
-		return data, err
+		return nil, err
 	}
-	_, err = data.UnmarshalMsg(bytesData)
-	return data, err
+	return NewDataFromBinary(
+		bytesData,
+	)
 }
 
 // NewData creates new tone
