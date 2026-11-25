@@ -71,7 +71,7 @@ func NewRawToneFromYAML(
 	)
 }
 
-// FromBinary converts yaml binary data to raw tone
+// NewRawToneFromBinary converts yaml binary data to raw tone
 func NewRawToneFromBinary(
 	bytesData []byte,
 ) (*RawTone, error) {
@@ -131,7 +131,7 @@ func (raw *RawTone) FromRawToneToPhontx() (*Data, error) {
 	return data, nil
 }
 
-// RawYAMLToPhontx converts raw yaml binary data to phontx
+// RawYAMLBinaryToPhontx converts raw yaml binary data to phontx
 func RawYAMLBinaryToPhontx(
 	binaryData []byte,
 ) (*Data, error) {
