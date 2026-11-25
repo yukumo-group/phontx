@@ -24,6 +24,15 @@ var TargetAudioFileName string
 // TargetAudioDirectory defines the directory that stores audio file
 var TargetAudioDirectory string
 
+// TargetPhontxDirectoryPath defines the target path of the exported phontx file
+var TargetPhontxDirectoryPath string
+
+// TargetPhontxFileName defines the file name of the target phontx file
+var TargetPhontxFileName string
+
+// TargetYAMLPath defines the path of the yaml file to use
+var TargetYAMLPath string
+
 // rootCommand defines the root command
 var rootCommand = &cobra.Command{
 	Use:   "phontx",
@@ -54,7 +63,10 @@ func init() {
 		"",
 		"path to phontx file",
 	)
-	readPhontxCommand.MarkFlagRequired("filePath")
+	err := readPhontxCommand.MarkPersistentFlagRequired("filePath")
+	if err != nil {
+		panic(err)
+	}
 	// Set arguments for synth audio
 	synthAudioCommand.PersistentFlags().StringVarP(
 		&PhontxFilePath,
@@ -63,7 +75,10 @@ func init() {
 		"",
 		"path to phontx file",
 	)
-	synthAudioCommand.MarkFlagRequired("filePath")
+	err = synthAudioCommand.MarkPersistentFlagRequired("filePath")
+	if err != nil {
+		panic(err)
+	}
 	synthAudioCommand.PersistentFlags().StringVarP(
 		&TargetText,
 		"targetText",
@@ -71,7 +86,10 @@ func init() {
 		"",
 		"text to generate",
 	)
-	synthAudioCommand.MarkFlagRequired("targetText")
+	err = synthAudioCommand.MarkPersistentFlagRequired("targetText")
+	if err != nil {
+		panic(err)
+	}
 	synthAudioCommand.PersistentFlags().StringVarP(
 		&TargetAudioFileName,
 		"targetAudioFileName",
@@ -79,7 +97,10 @@ func init() {
 		"",
 		"the target name of the audio file (no .wav suffix needed)",
 	)
-	synthAudioCommand.MarkFlagRequired("targetAudioFileName")
+	err = synthAudioCommand.MarkPersistentFlagRequired("targetAudioFileName")
+	if err != nil {
+		panic(err)
+	}
 	synthAudioCommand.PersistentFlags().StringVarP(
 		&TargetAudioDirectory,
 		"targetAudioDirectory",
@@ -101,6 +122,46 @@ func init() {
 		-1,
 		"volume of the generated audio",
 	)
+	// Set argument for converting yaml file
+	toPhontxCommand.PersistentFlags().StringVarP(
+		&TargetPhontxDirectoryPath,
+		"targetPhontxDirectoryPath",
+		"d",
+		"./",
+		"the path for directory to store phontx file",
+	)
+	err = toPhontxCommand.MarkPersistentFlagRequired(
+		"targetPhontxDirectoryPath",
+	)
+	if err != nil {
+		panic(err)
+	}
+	toPhontxCommand.PersistentFlags().StringVarP(
+		&TargetYAMLPath,
+		"targetYAMLPath",
+		"y",
+		"",
+		"the path for target yaml file for inputting",
+	)
+	err = toPhontxCommand.MarkPersistentFlagRequired(
+		"targetYAMLPath",
+	)
+	if err != nil {
+		panic(err)
+	}
+	toPhontxCommand.PersistentFlags().StringVarP(
+		&TargetPhontxFileName,
+		"targetPhontxFileName",
+		"f",
+		"",
+		"the name of the target phontx file, no suffix is needed",
+	)
+	err = toPhontxCommand.MarkPersistentFlagRequired(
+		"targetPhontxFileName",
+	)
+	if err != nil {
+		panic(err)
+	}
 	// Add subcommands for a command
 	readPhontxCommand.AddCommand(
 		showEngineInfo,
@@ -109,6 +170,7 @@ func init() {
 		createPhontxCommand,
 		readPhontxCommand,
 		synthAudioCommand,
+		toPhontxCommand,
 	)
 }
 
