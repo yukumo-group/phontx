@@ -6,7 +6,7 @@
 [![Go Version](https://img.shields.io/github/go-mod/go-version/yukumo-group/phontx)](go.mod)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-`phontx` is a Go library and CLI for **unified tone files for the AquesTalk family of Japanese text-to-speech engines**. A single `.phontx` file describes how a voice sounds on **AquesTalk1**, **AquesTalk2**, and **AquesTalk10** at once, and the CLI can render that tone to a WAV file by running the [Yukw](https://github.com/yukumo-group/Yukw) engine module (Rust → WebAssembly) through [wazero](https://wazero.io/) — no CGO, no C toolchain, and no native SDK at runtime.
+`phontx` is a Go library and CLI for **unified tone files for the AquesTalk family of Japanese text-to-speech engines**. A single `.phontx` file describes how a voice sounds on **AquesTalk1**, **AquesTalk2**, and **AquesTalk10** at once. The CLI can create tones interactively or from YAML, and render them to WAV by running the [Yukw](https://github.com/yukumo-group/Yukw) engine module (Rust → WebAssembly) through [wazero](https://wazero.io/) — no CGO, no C toolchain, and no native SDK at runtime.
 
 > `.phontx` is not `.phont`. `.phont` is AquesTalk2's native voice data file. A `.phontx` is phontx's own container that can hold presets for all three engines and optionally embed a `.phont` file.
 
@@ -16,6 +16,7 @@
 - **Presets** — 9 AquesTalk1 presets, 16 AquesTalk2 presets, and 8 AquesTalk10 presets (including `custom`) are defined.
 - **Custom AquesTalk10 tone** — choose a base fragment (F1E / F2E / M1E) and tune pitch, accent, LMD, and FSC.
 - **Embedded `.phont`** — import an AquesTalk2 `.phont` voice and carry it inside the `.phontx` file.
+- **YAML conversion** — `toPhontx` turns a compact YAML description into a `.phontx` file.
 - **Inspectable** — `readPhontx` dumps a tone and `showEngineInfo` reports which engines it supports.
 - **Synthesis** — `synthAudio` writes a WAV file using the [Yukw](https://github.com/yukumo-group/Yukw) WebAssembly module, so the same binary works on Windows, Linux, and macOS.
 - **Library first** — the CLI is a thin layer over the exported `pkg/tone`, `pkg/aqdata`, `pkg/custom`, and `pkg/synth` packages.
@@ -26,6 +27,7 @@
 - [Requirements](#requirements)
 - [Build and install](#build-and-install)
 - [CLI usage](#cli-usage)
+- [YAML input](#yaml-input)
 - [Library usage](#library-usage)
 - [The `.phontx` format](#the-phontx-format)
 - [Presets and AquesTalk10 custom tones](#presets-and-aquestalk10-custom-tones)
@@ -53,6 +55,7 @@
 `cmd/main.go` loads `./aq_wasm.wasm` — relative to the **current working directory** — and compiles it once before any command runs. The exports used by `pkg/synth` are:
 
 - `aq_synthesize` — synthesize a WAV buffer from phonetic text and a 40-byte parameter block.
+- `aq_free` — release a WAV buffer allocated by the module.
 - `aq_error_message` — map an engine error code to an error token.
 
 Because the runtime is initialized for every subcommand, the file must be present even for `readPhontx`; starting `phontx` from a directory without it fails immediately.
@@ -110,7 +113,8 @@ phontx
 ├── createPhontx        interactive wizard that writes a .phontx file
 ├── readPhontx          dump a .phontx file
 │   └── showEngineInfo  report which engines the file supports
-└── synthAudio          render a WAV file from a .phontx file
+├── synthAudio          render a WAV file from a .phontx file
+└── toPhontx            convert a YAML tone description to a .phontx file
 ```
 
 ### `phontx createPhontx`
@@ -224,6 +228,102 @@ audio saved at out/hello.wav
 
 With the flag defaults, `-1` is converted to `uint32` before clamping, which selects the maximum instead of a sensible default. Pass explicit values (usually `100`) as in the example above. The output directory must already exist.
 
+### `phontx toPhontx`
+
+Converts a YAML tone description into a `.phontx` file. The converted tone is printed before it is saved.
+
+| Flag | Short | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `--targetYAMLPath` | `-y` | yes | | Path to the input YAML file |
+| `--targetPhontxDirectoryPath` | `-d` | yes | `./` in help | Directory for the generated `.phontx` file; it must already exist |
+| `--targetPhontxFileName` | `-f` | yes | | Output file name without the `.phontx` suffix |
+
+`-d` is marked required even though its help text shows a default of `./`; pass it explicitly. See [YAML input](#yaml-input) for the YAML schema and a full example.
+
+## YAML input
+
+`toPhontx` is a shortcut for creating a `.phontx` file without the interactive wizard. It reads a YAML mapping, converts it to a `tone.Data` with the helpers in `pkg/tone/raw_tone.go`, prints the result, and saves it.
+
+```yaml
+aq1_preset:
+  preset_name: f1
+aq2_preset:
+  preset_name: aq_defo1
+aq1_custom_tone:
+  base: 0
+  lmd: 100
+  fsc: 100
+```
+
+### YAML schema
+
+| Key | Type | Description |
+| --- | --- | --- |
+| `aq1_preset` | mapping | AquesTalk1 preset. Set `preset_name` or `preset_idx`; `preset_name` takes precedence. |
+| `aq2_preset` | mapping | AquesTalk2 preset. Same rules. |
+| `aq10_preset` | mapping | AquesTalk10 preset. Same rules; see the current limitation below. |
+| `aq1_custom_tone` | mapping | AquesTalk10 custom tone. Fields: `base` (`0` F1E, `1` F2E, `2` M1E), `lmd`, `fsc`, and optional `pitch` / `accent`. The YAML key is `aq1_custom_tone` in the current schema. |
+| `source_phont_file_path` | string | Reserved. Parsed, but not applied by the converter yet. |
+
+A preset mapping accepts either a name or an index:
+
+```yaml
+aq1_preset:
+  preset_name: f1
+# or:
+# aq1_preset:
+#   preset_idx: 0
+```
+
+`preset_idx` uses the indices in the [preset tables](#presets-and-aquestalk10-custom-tones); `preset_name` is usually easier to read.
+
+> **Current limitation.** The converter always applies `SetAq10CustomTone`, which sets the AquesTalk10 preset to `custom`. An `aq10_preset` entry is therefore overwritten, and `source_phont_file_path` is not loaded yet. YAML values are unmarshalled directly, so the `With*` clamping does not apply. Inspect the generated file with `readPhontx` if you need to confirm the result.
+
+### Example
+
+```console
+$ phontx toPhontx -y tone.yaml -d out -f yaml-tone
+- ToneData:
+    - Aq1Preset:
+        - Preset:
+            - Index: 0
+            - Name: f1
+    - Aq2Preset:
+        - Preset:
+            - Index: 1
+            - Name: aq_defo1
+    - Aq10Preset:
+        - Preset:
+            - Index: 0
+            - Name: custom
+    - Aq10CustomTone:
+        - Base: 0
+        - LMD: 100
+        - FSC: 100
+
+file saved at out/yaml-tone.phontx:
+```
+
+The dump order may vary. The output directory must already exist, and like every command, `toPhontx` needs `aq_wasm.wasm` in the working directory.
+
+### YAML conversion in Go
+
+The same conversion is available as a library:
+
+```go
+converted, err := tone.RawYAMLFileToPhontx("tone.yaml")
+if err != nil {
+	log.Fatal(err)
+}
+filePath, err := converted.SaveFile("out", "yaml-tone")
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Println("saved:", filePath)
+```
+
+For YAML already in memory, use `tone.RawYAMLBinaryToPhontx(data)`.
+
 ## Library usage
 
 The example below builds a tone for all three engines, saves it, loads it back, and renders a WAV file. It is a complete program; put it in a module that requires `github.com/yukumo-group/phontx`.
@@ -313,10 +413,10 @@ wrote out/hello.wav
 
 | Package | What it provides |
 | --- | --- |
-| `pkg/tone` | `Data` (the `.phontx` model), `NewData`, `NewDataFromFile`, setters, `SaveFile`, `SaveFileWithFullPath`, `Equals`, `GetAllowedEngines`, `IsVersionAllowed`, `GetPresetID` |
+| `pkg/tone` | `Data` (the `.phontx` model), `NewData`, `NewDataFromFile`, `NewDataFromBinary`, setters, `SaveFile`, `SaveFileWithFullPath`, `Equals`, `GetAllowedEngines`, `IsVersionAllowed`, `GetPresetID`, plus YAML helpers (`RawTone`, `RawPreset`, `NewRawToneFromYAML`, `NewRawToneFromBinary`, `FromRawToneToPhontx`, `RawYAMLFileToPhontx`, `RawYAMLBinaryToPhontx`) |
 | `pkg/aqdata` | `AquesVersion` (`AqVer1`, `AqVer2`, `AqVer10`), the generic `PresetList`, and every preset constant (`Aq1F1`, `Aq2AqDefo1`, `Aq10Custom`, ...) |
 | `pkg/custom` | `Aq10CustomTone` with `WithBase`, `WithPitch`, `WithAccent`, `WithLMD`, `WithFSC`, plus the `Aq10Base` values `F1E`, `F2E`, `M1E` |
-| `pkg/synth` | `GeneratorRuntime` (compiles the wasm once), `Generator` (one module instance), `Param`, `NewSynthParam`, `PackData` |
+| `pkg/synth` | `GeneratorRuntime` (compiles the wasm once), `Generator` (one module instance, with `Generate` and `FreeWavData`), `Param`, `NewSynthParam`, `PackData` |
 
 A few behaviours worth knowing:
 
@@ -324,11 +424,12 @@ A few behaviours worth knowing:
 - `SetAq10CustomTone` also sets `Aq10Preset` to `custom`, so the engine knows to use the custom parameters.
 - `SetPhontDataFromFile` accepts only files whose extension is `.phont`; the bytes are embedded in the `.phontx` as-is.
 - `NewSynthParam` clamps speed to 50–300 and volume to 0–300.
-- A `Generator` owns a single wasm module instance and its linear memory. Create one per synthesis (or per goroutine) and close it when done; `GeneratorRuntime` can stay alive and hand out many generators.
+- A `Generator` owns a single wasm module instance and its linear memory. `Generate` is guarded by an internal lock, so one `Generator` can be shared by goroutines but syntheses run one at a time; create separate generators for parallel synthesis. Close each generator when done; `GeneratorRuntime` can stay alive and hand out many generators.
+- `RawYAMLFileToPhontx` and `RawYAMLBinaryToPhontx` return a `*tone.Data`; `preset_name` wins over `preset_idx` when both are set.
 
 ## The `.phontx` format
 
-A `.phontx` file is a MessagePack-encoded `tone.Data` struct. There is no header or magic number: the top-level value is a map keyed by field name. Every field is optional, and a `nil` field means "this engine is not configured".
+A `.phontx` file is a MessagePack-encoded `tone.Data` struct. There is no header or magic number: the top-level value is a map keyed by field name. Every field is optional, and a `nil` field means "this engine is not configured". `tone.NewDataFromBinary` decodes the same representation from an in-memory byte slice.
 
 | Field | Type | Meaning |
 | --- | --- | --- |
@@ -458,13 +559,13 @@ The parameters above only apply while the AquesTalk10 preset is `custom`. Choosi
 
 1. `tone.NewDataFromFile` reads the file and unmarshals the MessagePack map into `tone.Data`.
 2. `synth.NewGenerator` instantiates a fresh WebAssembly module from the compiled Yukw `aq_wasm.wasm`; each generator gets its own linear memory.
-3. `Generator.Generate` performs the following steps:
+3. `Generator.Generate` takes the generator lock (concurrent calls are serialized) and then:
    - validates that the requested engine version is enabled by the tone,
    - writes the embedded `.phont` bytes (if any) at offset 0 of the module memory,
    - packs the engine parameters and writes them after the phont bytes,
    - writes the UTF-8 phonetic text,
    - calls `aq_synthesize`, and if the returned error code is non-zero, calls `aq_error_message` to turn it into an error,
-   - reads the WAV bytes back out of linear memory and writes the output file.
+   - reads the WAV bytes back out of linear memory, releases the module-owned buffer with `aq_free`, and writes the output file.
 4. Buffers are kept 4-byte aligned (`internal/bts.NextOffset`) so the wasm side sees naturally aligned fields.
 
 The parameter block produced by `synth.PackData` is a sequence of little-endian `uint32` values:
@@ -495,6 +596,7 @@ phontx/
 │   ├── read_phontx.go       dump a .phontx file
 │   ├── show_engine_info.go  showEngineInfo subcommand
 │   ├── synth.go             synthAudio command
+│   ├── yaml.go              toPhontx YAML conversion command
 │   ├── prompt.go            prompt helpers
 │   └── welcome.go           banner
 ├── internal/
@@ -513,10 +615,10 @@ phontx/
 
 | Package | Responsibility |
 | --- | --- |
-| `pkg/tone` | `Data` model, load/save, engine support checks |
+| `pkg/tone` | `Data` model, load/save, engine support checks, YAML input conversion |
 | `pkg/aqdata` | `AquesVersion`, preset definitions, generic `PresetList` |
 | `pkg/custom` | `Aq10CustomTone` and `Aq10Base` |
-| `pkg/synth` | `GeneratorRuntime`, `Generator`, `Param`, `PackData` |
+| `pkg/synth` | `GeneratorRuntime`, `Generator`, `Param`, `PackData`, `FreeWavData` |
 | `internal/ui` | prompts, preset/custom-tone wizards, `ToneToString`, `ShowEngineInfo` |
 | `internal/bts` | byte comparison, null-terminated string reading, offset alignment |
 | `internal/python` | `ExecutePython`, used by tests to generate expected byte fixtures |
@@ -531,7 +633,7 @@ golint -set_exit_status ./...     # what CI runs
 ```
 
 - A few tests execute Python (`internal/python`, and the parameter-packing test in `pkg/synth`), so `python` must resolve to Python 3.13 on `PATH`.
-- The `pkg/synth` tests perform real synthesis with `pkg/synth/testdata/aq_wasm.wasm` and write their output into `t.TempDir()`.
+- The `pkg/synth` tests perform real synthesis with `pkg/synth/testdata/aq_wasm.wasm` and write their output into `t.TempDir()`. `pkg/tone` has YAML conversion tests (`raw_tone_test.go`) that use `pkg/tone/testdata/testdata.yaml`.
 - Code generation: install the generator once with `go install github.com/tinylib/msgp@latest`, then run `go generate ./...` from the repository root. Do not hand-edit `*_gen.go` files.
 - CI (`.github/workflows/test.yaml`) runs on Ubuntu with the Go version from `go.mod` and Python 3.13, then runs `golint` and uploads coverage to Codecov.
 - Releases (`.github/workflows/release.yaml`) run GoReleaser when a `v*` tag is pushed and publish the `phontx` binary built from `./cmd`.
@@ -545,6 +647,8 @@ golint -set_exit_status ./...     # what CI runs
 - **`.phont` import is strict.** `SetPhontDataFromFile` rejects any extension other than `.phont` (the comparison is case-sensitive).
 - **AquesTalk10 custom parameters need the `custom` preset.** Pitch, accent, LMD, and FSC are ignored for the built-in AquesTalk10 presets.
 - **The `.phontx` format is not versioned.** msgp skips unknown keys, but structural changes to `tone.Data` are format changes.
+- **YAML conversion limitations.** `toPhontx` currently always sets the AquesTalk10 preset to `custom`, overwriting an `aq10_preset` entry; the custom-tone YAML key is `aq1_custom_tone`; and `source_phont_file_path` is parsed but not applied. Verify converted files with `readPhontx`.
+- **`toPhontx -d` is required.** The help text shows a default of `./`, but the CLI marks the flag as required; pass `-d` explicitly.
 
 ## Related projects
 

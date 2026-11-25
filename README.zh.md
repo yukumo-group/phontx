@@ -6,7 +6,7 @@
 [![Go Version](https://img.shields.io/github/go-mod/go-version/yukumo-group/phontx)](go.mod)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-`phontx` 是一个 Go 库兼命令行工具，用于 **AquesTalk 系列日语语音合成引擎的统一音色文件**。单个 `.phontx` 文件即可同时描述 **AquesTalk1**、**AquesTalk2** 和 **AquesTalk10** 三种引擎下的音色，CLI 还能通过 [wazero](https://wazero.io/) 运行 [Yukw](https://github.com/yukumo-group/Yukw) 引擎模块（Rust → WebAssembly），将该音色渲染为 WAV 文件——运行时不依赖 CGO、C 工具链或原生 SDK。
+`phontx` 是一个 Go 库兼命令行工具，用于 **AquesTalk 系列日语语音合成引擎的统一音色文件**。单个 `.phontx` 文件即可同时描述 **AquesTalk1**、**AquesTalk2** 和 **AquesTalk10** 三种引擎下的音色；CLI 可通过交互向导或 YAML 创建音色，并通过 [wazero](https://wazero.io/) 运行 [Yukw](https://github.com/yukumo-group/Yukw) 引擎模块（Rust → WebAssembly），将音色渲染为 WAV 文件——运行时不依赖 CGO、C 工具链或原生 SDK。
 
 > `.phontx` 不是 `.phont`。`.phont` 是 AquesTalk2 的原生音色数据文件；`.phontx` 是 phontx 自己的容器，可保存三种引擎的预设，并可选择内嵌一个 `.phont` 文件。
 
@@ -16,6 +16,7 @@
 - **预设** — 内置 9 个 AquesTalk1 预设、16 个 AquesTalk2 预设和 8 个 AquesTalk10 预设（含 `custom`）。
 - **AquesTalk10 自定义音色** — 选择基础素片（F1E / F2E / M1E），调节音高、重音、LMD 和 FSC。
 - **内嵌 `.phont`** — 导入 AquesTalk2 的 `.phont` 音色文件，并将其保存在 `.phontx` 中。
+- **YAML 转换** — `toPhontx` 可将简洁的 YAML 描述转换为 `.phontx` 文件。
 - **可查看** — `readPhontx` 输出音色内容，`showEngineInfo` 报告其支持哪些引擎。
 - **语音合成** — `synthAudio` 使用 [Yukw](https://github.com/yukumo-group/Yukw) WebAssembly 模块写出 WAV 文件，同一二进制可运行于 Windows、Linux 和 macOS。
 - **库优先** — CLI 只是 `pkg/tone`、`pkg/aqdata`、`pkg/custom` 和 `pkg/synth` 等导出包之上的薄封装。
@@ -26,6 +27,7 @@
 - [环境要求](#环境要求)
 - [构建与安装](#构建与安装)
 - [CLI 用法](#cli-用法)
+- [YAML 输入](#yaml-输入)
 - [库用法](#库用法)
 - [`.phontx` 格式](#phontx-格式)
 - [预设与 AquesTalk10 自定义音色](#预设与-aquestalk10-自定义音色)
@@ -53,6 +55,7 @@
 `cmd/main.go` 会加载 `./aq_wasm.wasm`（相对于**当前工作目录**），并在任何命令执行前编译一次。`pkg/synth` 使用的导出为：
 
 - `aq_synthesize` — 根据语音记号和 40 字节参数块合成 WAV 缓冲区。
+- `aq_free` — 释放模块分配的 WAV 缓冲区。
 - `aq_error_message` — 将引擎错误码转换为错误信息。
 
 由于每个子命令启动时都会初始化运行时，即使只运行 `readPhontx` 也必须存在该文件；在不含该文件的目录中启动 `phontx` 会立即失败。
@@ -110,7 +113,8 @@ phontx
 ├── createPhontx        交互式向导，写出 .phontx 文件
 ├── readPhontx          输出 .phontx 文件内容
 │   └── showEngineInfo  报告文件支持的引擎
-└── synthAudio          从 .phontx 文件渲染 WAV
+├── synthAudio          从 .phontx 文件渲染 WAV
+└── toPhontx            将 YAML 音色描述转换为 .phontx 文件
 ```
 
 ### `phontx createPhontx`
@@ -224,6 +228,102 @@ audio saved at out/hello.wav
 
 使用参数默认值时，`-1` 会在限制前转换为 `uint32`，因而选中最大值而非合理默认值。请像上面的示例一样显式传入值（通常为 `100`）。输出目录必须已存在。
 
+### `phontx toPhontx`
+
+将 YAML 音色描述转换为 `.phontx` 文件。转换后的音色会先打印出来，然后再保存。
+
+| 参数 | 短参数 | 必填 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `--targetYAMLPath` | `-y` | 是 | | 输入 YAML 文件路径 |
+| `--targetPhontxDirectoryPath` | `-d` | 是 | 帮助中显示 `./` | 生成的 `.phontx` 文件所在目录；该目录必须已存在 |
+| `--targetPhontxFileName` | `-f` | 是 | | 输出文件名，不带 `.phontx` 后缀 |
+
+尽管帮助文本显示默认值为 `./`，`-d` 仍被标记为必填；请显式传入。YAML 格式与完整示例见 [YAML 输入](#yaml-输入)。
+
+## YAML 输入
+
+`toPhontx` 是无需交互向导即可创建 `.phontx` 文件的快捷方式。它读取 YAML 映射，使用 `pkg/tone/raw_tone.go` 中的辅助函数转换为 `tone.Data`，打印转换结果并保存文件。
+
+```yaml
+aq1_preset:
+  preset_name: f1
+aq2_preset:
+  preset_name: aq_defo1
+aq1_custom_tone:
+  base: 0
+  lmd: 100
+  fsc: 100
+```
+
+### YAML 结构
+
+| 键 | 类型 | 说明 |
+| --- | --- | --- |
+| `aq1_preset` | 映射 | AquesTalk1 预设。设置 `preset_name` 或 `preset_idx`；两者同时存在时 `preset_name` 优先。 |
+| `aq2_preset` | 映射 | AquesTalk2 预设，规则相同。 |
+| `aq10_preset` | 映射 | AquesTalk10 预设，规则相同；参见下方的当前限制。 |
+| `aq1_custom_tone` | 映射 | AquesTalk10 自定义音色。字段：`base`（`0` F1E、`1` F2E、`2` M1E）、`lmd`、`fsc`，以及可选的 `pitch` / `accent`。当前结构中的 YAML 键为 `aq1_custom_tone`。 |
+| `source_phont_file_path` | 字符串 | 保留字段。会被解析，但转换器尚未应用。 |
+
+预设映射可以使用名称或索引：
+
+```yaml
+aq1_preset:
+  preset_name: f1
+# 或者：
+# aq1_preset:
+#   preset_idx: 0
+```
+
+`preset_idx` 使用[预设表](#预设与-aquestalk10-自定义音色)中的索引；`preset_name` 通常更易读。
+
+> **当前限制。** 转换器总会调用 `SetAq10CustomTone`，从而将 AquesTalk10 预设设为 `custom`。因此 `aq10_preset` 会被覆盖，`source_phont_file_path` 也尚未加载。YAML 值会被直接反序列化，因此不会应用 `With*` 的限制。如需确认结果，请用 `readPhontx` 检查生成的文件。
+
+### 示例
+
+```console
+$ phontx toPhontx -y tone.yaml -d out -f yaml-tone
+- ToneData:
+    - Aq1Preset:
+        - Preset:
+            - Index: 0
+            - Name: f1
+    - Aq2Preset:
+        - Preset:
+            - Index: 1
+            - Name: aq_defo1
+    - Aq10Preset:
+        - Preset:
+            - Index: 0
+            - Name: custom
+    - Aq10CustomTone:
+        - Base: 0
+        - LMD: 100
+        - FSC: 100
+
+file saved at out/yaml-tone.phontx:
+```
+
+转储顺序可能变化。输出目录必须已存在；与所有命令一样，`toPhontx` 也需要工作目录中存在 `aq_wasm.wasm`。
+
+### 在 Go 中转换 YAML
+
+同样的转换也可作为库使用：
+
+```go
+converted, err := tone.RawYAMLFileToPhontx("tone.yaml")
+if err != nil {
+	log.Fatal(err)
+}
+filePath, err := converted.SaveFile("out", "yaml-tone")
+if err != nil {
+	log.Fatal(err)
+}
+fmt.Println("saved:", filePath)
+```
+
+若 YAML 已在内存中，请使用 `tone.RawYAMLBinaryToPhontx(data)`。
+
 ## 库用法
 
 下面的示例构建一个适用于全部三种引擎的音色，保存后重新加载，并渲染 WAV 文件。它是完整程序；请放在一个依赖 `github.com/yukumo-group/phontx` 的模块中。
@@ -313,10 +413,10 @@ wrote out/hello.wav
 
 | 包 | 提供的内容 |
 | --- | --- |
-| `pkg/tone` | `Data`（`.phontx` 模型）、`NewData`、`NewDataFromFile`、各设置方法、`SaveFile`、`SaveFileWithFullPath`、`Equals`、`GetAllowedEngines`、`IsVersionAllowed`、`GetPresetID` |
+| `pkg/tone` | `Data`（`.phontx` 模型）、`NewData`、`NewDataFromFile`、`NewDataFromBinary`、各设置方法、`SaveFile`、`SaveFileWithFullPath`、`Equals`、`GetAllowedEngines`、`IsVersionAllowed`、`GetPresetID`，以及 YAML 辅助函数（`RawTone`、`RawPreset`、`NewRawToneFromYAML`、`NewRawToneFromBinary`、`FromRawToneToPhontx`、`RawYAMLFileToPhontx`、`RawYAMLBinaryToPhontx`） |
 | `pkg/aqdata` | `AquesVersion`（`AqVer1`、`AqVer2`、`AqVer10`）、泛型 `PresetList`，以及所有预设常量（`Aq1F1`、`Aq2AqDefo1`、`Aq10Custom` 等） |
 | `pkg/custom` | `Aq10CustomTone` 及其 `WithBase`、`WithPitch`、`WithAccent`、`WithLMD`、`WithFSC`，以及 `Aq10Base` 值 `F1E`、`F2E`、`M1E` |
-| `pkg/synth` | `GeneratorRuntime`（只编译一次 wasm）、`Generator`（单个模块实例）、`Param`、`NewSynthParam`、`PackData` |
+| `pkg/synth` | `GeneratorRuntime`（只编译一次 wasm）、`Generator`（单个模块实例，含 `Generate` 和 `FreeWavData`）、`Param`、`NewSynthParam`、`PackData` |
 
 一些值得了解的行为：
 
@@ -324,11 +424,12 @@ wrote out/hello.wav
 - `SetAq10CustomTone` 还会将 `Aq10Preset` 设为 `custom`，以便引擎使用自定义参数。
 - `SetPhontDataFromFile` 只接受扩展名为 `.phont` 的文件；其字节会原样嵌入 `.phontx`。
 - `NewSynthParam` 会将语速限制为 50–300，将音量限制为 0–300。
-- 一个 `Generator` 拥有一个 wasm 模块实例及其线性内存。每次合成（或每个 goroutine）创建一个，并在完成后关闭；`GeneratorRuntime` 可以长期存活并创建多个 generator。
+- 一个 `Generator` 拥有一个 wasm 模块实例及其线性内存。`Generate` 由内部锁保护，因此一个 `Generator` 可以被多个 goroutine 共享，但合成会串行执行；如需并行合成，请创建多个 generator。完成后请关闭每个 generator；`GeneratorRuntime` 可以长期存活并创建多个 generator。
+- `RawYAMLFileToPhontx` 和 `RawYAMLBinaryToPhontx` 返回 `*tone.Data`；两者同时设置时 `preset_name` 优先于 `preset_idx`。
 
 ## `.phontx` 格式
 
-`.phontx` 文件是 MessagePack 编码的 `tone.Data` 结构体。文件没有头部或魔数：顶层值是以字段名为键的映射。所有字段都是可选的，`nil` 字段表示“该引擎未配置”。
+`.phontx` 文件是 MessagePack 编码的 `tone.Data` 结构体。文件没有头部或魔数：顶层值是以字段名为键的映射。所有字段都是可选的，`nil` 字段表示“该引擎未配置”。`tone.NewDataFromBinary` 可从内存中的字节切片解码相同的表示。
 
 | 字段 | 类型 | 含义 |
 | --- | --- | --- |
@@ -458,13 +559,13 @@ toneData := tone.NewData().SetAq10CustomTone(customTone)
 
 1. `tone.NewDataFromFile` 读取文件并将 MessagePack 映射反序列化为 `tone.Data`。
 2. `synth.NewGenerator` 从编译后的 Yukw `aq_wasm.wasm` 实例化一个新的 WebAssembly 模块；每个 generator 拥有独立的线性内存。
-3. `Generator.Generate` 执行以下步骤：
+3. `Generator.Generate` 会先获取 generator 锁（并发调用将串行执行），然后：
    - 验证音色启用了所请求的引擎版本；
    - 将内嵌的 `.phont` 字节（如有）写入模块内存偏移 0；
    - 打包引擎参数并写入 `.phont` 字节之后；
    - 写入 UTF-8 语音记号文本；
    - 调用 `aq_synthesize`；若返回的错误码非零，则调用 `aq_error_message` 转换为错误；
-   - 从线性内存读回 WAV 字节并写入输出文件。
+   - 从线性内存读回 WAV 字节，通过 `aq_free` 释放模块持有的缓冲区，并写入输出文件。
 4. 各缓冲区保持 4 字节对齐（`internal/bts.NextOffset`），以便 wasm 侧访问自然对齐的字段。
 
 `synth.PackData` 生成的参数块是一系列小端 `uint32`：
@@ -495,6 +596,7 @@ phontx/
 │   ├── read_phontx.go       输出 .phontx 文件
 │   ├── show_engine_info.go  showEngineInfo 子命令
 │   ├── synth.go             synthAudio 命令
+│   ├── yaml.go              toPhontx YAML 转换命令
 │   ├── prompt.go            提示辅助函数
 │   └── welcome.go           欢迎横幅
 ├── internal/
@@ -513,10 +615,10 @@ phontx/
 
 | 包 | 职责 |
 | --- | --- |
-| `pkg/tone` | `Data` 模型、加载/保存、引擎支持检查 |
+| `pkg/tone` | `Data` 模型、加载/保存、引擎支持检查、YAML 输入转换 |
 | `pkg/aqdata` | `AquesVersion`、预设定义、泛型 `PresetList` |
 | `pkg/custom` | `Aq10CustomTone` 与 `Aq10Base` |
-| `pkg/synth` | `GeneratorRuntime`、`Generator`、`Param`、`PackData` |
+| `pkg/synth` | `GeneratorRuntime`、`Generator`、`Param`、`PackData`、`FreeWavData` |
 | `internal/ui` | 交互提示、预设/自定义音色向导、`ToneToString`、`ShowEngineInfo` |
 | `internal/bts` | 字节比较、空终止字符串读取、偏移对齐 |
 | `internal/python` | `ExecutePython`，测试用它生成期望的字节数据 |
@@ -531,7 +633,7 @@ golint -set_exit_status ./...     # CI 执行的检查
 ```
 
 - 部分测试会执行 Python（`internal/python` 以及 `pkg/synth` 中的参数打包测试），因此 `python` 必须能在 `PATH` 中解析到 Python 3.13。
-- `pkg/synth` 的测试会使用 `pkg/synth/testdata/aq_wasm.wasm` 进行真实合成，并将输出写入 `t.TempDir()`。
+- `pkg/synth` 的测试会使用 `pkg/synth/testdata/aq_wasm.wasm` 进行真实合成，并将输出写入 `t.TempDir()`。`pkg/tone` 包含 YAML 转换测试（`raw_tone_test.go`），使用 `pkg/tone/testdata/testdata.yaml`。
 - 代码生成：先执行 `go install github.com/tinylib/msgp@latest` 安装生成器，然后在仓库根目录运行 `go generate ./...`。不要手工编辑 `*_gen.go` 文件。
 - CI（`.github/workflows/test.yaml`）在 Ubuntu 上运行，使用 `go.mod` 指定的 Go 版本和 Python 3.13，然后运行 `golint` 并将覆盖率上传到 Codecov。
 - 发布流程（`.github/workflows/release.yaml`）在推送 `v*` 标签时运行 GoReleaser，并发布由 `./cmd` 构建的 `phontx` 二进制。
@@ -545,6 +647,8 @@ golint -set_exit_status ./...     # CI 执行的检查
 - **`.phont` 导入要求严格。** `SetPhontDataFromFile` 会拒绝除 `.phont` 之外的扩展名（比较区分大小写）。
 - **AquesTalk10 自定义参数需要 `custom` 预设。** 对于内置 AquesTalk10 预设，音高、重音、LMD 和 FSC 会被忽略。
 - **`.phontx` 格式没有版本号。** msgp 会跳过未知键，但对 `tone.Data` 的结构性修改就是格式变更。
+- **YAML 转换的限制。** `toPhontx` 目前总会将 AquesTalk10 预设设为 `custom`，从而覆盖 `aq10_preset`；自定义音色的 YAML 键为 `aq1_custom_tone`；`source_phont_file_path` 会被解析但尚未应用。请用 `readPhontx` 检查转换后的文件。
+- **`toPhontx -d` 为必填。** 帮助文本显示默认值为 `./`，但 CLI 将该参数标记为必填；请显式传入 `-d`。
 
 ## 相关项目
 
