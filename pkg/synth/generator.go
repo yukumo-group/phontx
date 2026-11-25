@@ -172,13 +172,13 @@ func (generator *Generator) GiveError(
 	)
 }
 
-// Generate generates an audio
-func (generator *Generator) Generate(
+// GenerateBinaryData generates binary data
+func (generator *Generator) GenerateBinaryData(
 	ctx context.Context,
 	version aqdata.AquesVersion,
 	param *Param,
 	toneData *tone.Data,
-) error {
+) ([]byte, error) {
 	generator.lock.Lock()
 	defer generator.lock.Unlock()
 	const synthFunctionName string = "aq_synthesize"
@@ -187,7 +187,7 @@ func (generator *Generator) Generate(
 		synthFunctionName,
 	)
 	if exportedSynthFunction == nil {
-		return fmt.Errorf(
+		return nil, fmt.Errorf(
 			"function %s does not exist",
 			synthFunctionName,
 		)
@@ -197,10 +197,10 @@ func (generator *Generator) Generate(
 		version,
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !versionAllowed {
-		return fmt.Errorf(
+		return nil, fmt.Errorf(
 			"version %s is not allowed",
 			version.ToString(),
 		)
@@ -219,7 +219,7 @@ func (generator *Generator) Generate(
 	)
 	lengthOfPhontData := len(phontData)
 	if !ok {
-		return fmt.Errorf(
+		return nil, fmt.Errorf(
 			"data of length %d out of range",
 			lengthOfPhontData,
 		)
@@ -232,7 +232,7 @@ func (generator *Generator) Generate(
 		param,
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	packedDataOffset := bts.NextOffset(
 		phontDataOffset,
@@ -244,7 +244,7 @@ func (generator *Generator) Generate(
 	)
 	lengthOfPackedData := len(packedData)
 	if !ok {
-		return fmt.Errorf(
+		return nil, fmt.Errorf(
 			"data, length of %d, starting from offset %d, is out of range",
 			lengthOfPackedData,
 			packedDataOffset,
@@ -262,7 +262,7 @@ func (generator *Generator) Generate(
 	)
 	lengthOfText := len(textConvertedToBytes)
 	if !ok {
-		return fmt.Errorf(
+		return nil, fmt.Errorf(
 			"data, length of %d, starting from offset %d, is out of range",
 			lengthOfText,
 			textOffset,
@@ -285,10 +285,10 @@ func (generator *Generator) Generate(
 		uint64(outLen),
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if len(returnedData) < 1 {
-		return errors.New(
+		return nil, errors.New(
 			"no data returned",
 		)
 	}
@@ -298,7 +298,7 @@ func (generator *Generator) Generate(
 		returnedData[0],
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	// get wav data and save
 	outOffset, wavData, err := generator.GetWavData(
@@ -307,18 +307,37 @@ func (generator *Generator) Generate(
 		param.FilePath,
 	)
 	if err != nil {
-		return err
+		return wavData, err
 	}
 	err = generator.FreeWavData(
 		ctx,
 		uint64(outOffset),
 	)
 	if err != nil {
+		return wavData, err
+	}
+	return wavData, nil
+}
+
+// Generate generates an audio
+func (generator *Generator) Generate(
+	ctx context.Context,
+	version aqdata.AquesVersion,
+	param *Param,
+	toneData *tone.Data,
+) error {
+	binaryData, err := generator.GenerateBinaryData(
+		ctx,
+		version,
+		param,
+		toneData,
+	)
+	if err != nil {
 		return err
 	}
 	err = os.WriteFile(
 		param.FilePath,
-		wavData,
+		binaryData,
 		0644,
 	)
 	return err

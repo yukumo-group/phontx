@@ -9,44 +9,51 @@ import (
 
 // GeneratorRuntime defines the runtime for generator
 type GeneratorRuntime struct {
-	generatorWasmFilePath   string
 	runtime                 wazero.Runtime
 	compiledGeneratorModule wazero.CompiledModule
 }
 
 // NewGeneratorRuntime creates new generator runtime
-func NewGeneratorRuntime(
-	generatorWasmFilePath string,
-) *GeneratorRuntime {
-	return &GeneratorRuntime{
-		generatorWasmFilePath: generatorWasmFilePath,
-	}
+func NewGeneratorRuntime() *GeneratorRuntime {
+	return &GeneratorRuntime{}
 }
 
-// InitializeRuntime creates runtime
-func (generator *GeneratorRuntime) InitializeRuntime(
+// InitializeRuntimeFromBinary initializes runtime from binary data
+func (generator *GeneratorRuntime) InitializeRuntimeFromBinary(
 	ctx context.Context,
+	binaryData []byte,
 ) error {
-	generator.runtime = wazero.NewRuntime(ctx)
-	_, err := os.Stat(generator.generatorWasmFilePath)
-	if err != nil {
-		return err
-	}
-	wasmGeneratorByte, err := os.ReadFile(
-		generator.generatorWasmFilePath,
-	)
-	if err != nil {
-		return err
-	}
 	compiledModule, err := generator.runtime.CompileModule(
 		ctx,
-		wasmGeneratorByte,
+		binaryData,
 	)
 	if err != nil {
 		return err
 	}
 	generator.compiledGeneratorModule = compiledModule
 	return nil
+}
+
+// InitializeRuntime creates runtime
+func (generator *GeneratorRuntime) InitializeRuntime(
+	ctx context.Context,
+	generatorWasmFilePath string,
+) error {
+	generator.runtime = wazero.NewRuntime(ctx)
+	_, err := os.Stat(generatorWasmFilePath)
+	if err != nil {
+		return err
+	}
+	wasmGeneratorByte, err := os.ReadFile(
+		generatorWasmFilePath,
+	)
+	if err != nil {
+		return err
+	}
+	return generator.InitializeRuntimeFromBinary(
+		ctx,
+		wasmGeneratorByte,
+	)
 }
 
 // CloseRuntime closes the runtime

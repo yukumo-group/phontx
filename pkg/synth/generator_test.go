@@ -13,11 +13,10 @@ func TestRuntime(t *testing.T) {
 	t.Parallel()
 	ctx := t.Context()
 	const wasmPath string = "testdata/aq_wasm.wasm"
-	testRuntime := NewGeneratorRuntime(
-		wasmPath,
-	)
+	testRuntime := NewGeneratorRuntime()
 	err := testRuntime.InitializeRuntime(
 		ctx,
+		wasmPath,
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -40,11 +39,10 @@ func TestGenerator(t *testing.T) {
 		tempDir,
 	)
 	// Load wasm
-	testRuntime := NewGeneratorRuntime(
-		wasmPath,
-	)
+	testRuntime := NewGeneratorRuntime()
 	err := testRuntime.InitializeRuntime(
 		ctx,
+		wasmPath,
 	)
 	if err != nil {
 		t.Fatal(err)
